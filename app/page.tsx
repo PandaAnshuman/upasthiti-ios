@@ -67,7 +67,7 @@ const Home: NextPage = () => {
           {/* "About" div to open the TeamProfile modal on click */}
           <div
             className="flex flex-col items-center p-6 bg-white rounded-2xl shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 w-44 transition-transform transform hover:scale-105 cursor-pointer"
-            onClick={onOpen} // Open modal on div click
+            onClick={onOpen} // Open modal on click
           >
             <div className="mb-4 flex justify-center">
               <Info size={56} fill="#FFD700" />

@@ -61,7 +61,13 @@ export default function TeamProfile() {
   }, [onOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" className="bg-black">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="md"
+      className="bg-black"
+      backdrop="blur"
+    >
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           <Button
