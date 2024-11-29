@@ -1,7 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import localFont from "next/font/local";
 import "./globals.css";
-
+import { useEffect } from "react";
+import disableDevtool from "disable-devtool";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -13,22 +16,22 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "Upasthiti iOS",
-  description: "Created By Dev Verse",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffect(() => {
+    disableDevtool();
+  });
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <ToastContainer />
       </body>
     </html>
   );

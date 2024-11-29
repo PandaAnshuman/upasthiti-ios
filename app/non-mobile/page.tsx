@@ -8,10 +8,16 @@
 //   );
 // };
 
+"use client";
+
+import disableDevtool from "disable-devtool";
 // export default NonMobile;
-import React from "react";
+import React, { useEffect } from "react";
 
 const page = () => {
+  useEffect(() => {
+    disableDevtool();
+  });
   return (
     <div>
       <h1 className="flex justify-items-center">Access Restricted</h1>
