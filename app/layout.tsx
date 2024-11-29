@@ -16,6 +16,8 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +34,10 @@ export default function RootLayout({
       >
         {children}
         <ToastContainer />
+        <script
+          disable-devtool-auto
+          src="https://cdn.jsdelivr.net/npm/disable-devtool@0.2.6/disable-devtool.min.js#use"
+        ></script>
       </body>
     </html>
   );
