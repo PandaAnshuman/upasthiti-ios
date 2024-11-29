@@ -1,33 +1,50 @@
 "use client";
 import type { NextPage } from "next";
-import Head from "next/head";
 import { ScanQrCode, QrCode, BellRing, Info } from "lucide-react";
-import TeamProfile from "./components/AboutUS/page";
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import TeamProfile from "./components/About-us/page";
+import { Scanner } from "@yudiel/react-qr-scanner";
+import QRCode from "react-qr-code";
 import {
   Modal,
   ModalContent,
   ModalBody,
   useDisclosure,
 } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import DeviceFingerprint from "./components/DeviceFingerprint";
+import { useAppSelector } from "@/redux/store";
 
 const Home: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [data, setdata] = useState("");
+  const [data, setData] = useState("");
   const [isScannerActive, setIsScannerActive] = useState(false); // State to control scanner visibility
+  const [isQrVisible, setIsQrVisible] = useState(false); // State to control QR Code visibility
+
+  const [visitorId, setVisitorId] = useState<string>("");
+
+  const handleVisitorId = (id: string) => {
+    setVisitorId(id);
+    console.log("Captured Visitor ID:", id);
+    // You can also send this ID to your backend or use it further in the app
+  };
+
+  const regdNum = useAppSelector(
+    (state) => state.profileReducer.value.registration_no
+  );
+  const name = useAppSelector((state) => state.profileReducer.value.name);
+  const value = regdNum + name;
+  console.log(value);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 flex flex-col items-center justify-start">
-      <Head>
-        <title>Attendance App</title>
-        <meta name="description" content="Attendance App UI" />
-      </Head>
-
       <div className="w-full max-w-xl px-6 mb-8">
         <div className="text-left text-black font-semibold">
           <h1 className="text-2xl md:text-3xl lg:text-4xl">
-            Welcome, <span className="text-blue-600">ANSHUMAN</span> 👋
+            Welcome,{" "}
+            <span className="text-blue-600">
+              {name.split(" ")[0].toUpperCase()}
+            </span>{" "}
+            👋
           </h1>
         </div>
       </div>
@@ -50,15 +67,12 @@ const Home: NextPage = () => {
         {/* Conditional QR Scanner */}
         {isScannerActive && (
           <div className="w-full flex flex-col items-center space-y-4">
-            <BarcodeScannerComponent
-              width={500}
-              height={500}
-              onUpdate={(err, result) => {
+            <Scanner
+              onScan={(result) => {
                 if (result) {
-                  setdata((result as any).text); // Using type cast as a workaround
+                  console.log(result);
+                  setData((result as any).text); // Using type cast as a workaround
                   setIsScannerActive(false); // Close scanner after scanning
-                } else {
-                  setdata("Not Found");
                 }
               }}
             />
@@ -73,7 +87,10 @@ const Home: NextPage = () => {
         <p className="text-black">{data}</p>
 
         {/* Show QR Button */}
-        <button className="flex w-full items-center p-5 bg-blue-400 text-black rounded-2xl shadow-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <button
+          onClick={() => setIsQrVisible(true)} // Show QR Code on click
+          className="flex w-full items-center p-5 bg-blue-400 text-black rounded-2xl shadow-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
           <div className="flex-1">
             <h2 className="text-xl font-semibold">Show QR</h2>
             <p className="text-base">Show it only to your faculty</p>
@@ -83,6 +100,27 @@ const Home: NextPage = () => {
           </div>
         </button>
       </div>
+
+      {/* Conditional QR Code Display */}
+      {isQrVisible && regdNum ? (
+        <>
+          <QRCode
+            size={256} // Base size for the QR Code
+            style={{
+              height: "350px",
+              maxWidth: "300px", // Set maximum width for mobile devices
+              width: "100%", // Use responsive width
+            }}
+            value={value} // QR Code value
+          />
+          <button
+            onClick={() => setIsQrVisible(false)}
+            className=" bg-red-500 text-white rounded-full px-2 py-1 text-sm"
+          >
+            Close Qr
+          </button>
+        </>
+      ) : null}
 
       <div className="w-full max-w-xl px-6 mt-8">
         <div className="grid grid-cols-2 gap-6">
@@ -121,6 +159,9 @@ const Home: NextPage = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+
+      <DeviceFingerprint onVisitorIdCaptured={handleVisitorId} />
+      <p className="text-black">Visitor ID : {visitorId}</p>
     </div>
   );
 };

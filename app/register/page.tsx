@@ -4,6 +4,10 @@ import { Link, User, Lock, Mail } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import * as yup from "yup";
+import DeviceFingerprint from "../components/DeviceFingerprint";
+import { resetProfile, updateProfile } from "@/redux/features/profile-slice";
+import { useDispatch } from "react-redux";
+import { AppDispatch, useAppSelector } from "@/redux/store";
 const RegistrationPage = () => {
   const [AuthType, setAuthType] = useState<"REGISTER" | "LOGIN">("REGISTER");
   const [formData, setFormData] = useState({
@@ -14,7 +18,8 @@ const RegistrationPage = () => {
     email: "",
     registration_no: "",
   });
-
+  const [visitorId, setVisitorId] = useState<string>("");
+  const dispatch = useDispatch<AppDispatch>();
   const branches = [
     "CSE",
     "CSIT",
@@ -68,6 +73,12 @@ const RegistrationPage = () => {
       sections: [50],
     },
   ];
+  const handleVisitorId = (id: string) => {
+    if (!visitorId) {
+      setVisitorId(id);
+      console.log("Captured Visitor ID:", id);
+    }
+  };
 
   const validationSchema = yup.object({
     name: yup
@@ -122,16 +133,89 @@ const RegistrationPage = () => {
     }
   };
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     // Validate form data against the schema
+  //     if (!visitorId) {
+  //       toast.error("Visitor ID not captured yet. Please refresh the page.");
+  //       return;
+  //     }
+  //     const validityResponse = await validationSchema.validate(formData, {
+  //       abortEarly: false,
+  //     });
+  //     console.log(
+  //       AuthType === "REGISTER" ? "Registration Data:" : "Login Data:",
+  //       validityResponse
+  //     );
+  //     console.log("Visitor ID:", visitorId);
+  //     const data = {
+  //       password: formData.password,
+  //       passwordConfirm: formData.password,
+  //       email: formData.email,
+  //       name: formData.name,
+  //       registration_no: formData.registration_no,
+  //       section: formData.section,
+  //       branch: formData.branch,
+  //       visitor_id: visitorId,
+  //     };
+  //     console.log("Visitor ID:", data.visitor_id);
+
+  //     const record = await pb.collection("users").create(data);
+  //     if (record?.id) {
+  //       const authData = await pb
+  //         .collection("users")
+  //         .authWithPassword(formData.registration_no, formData.password);
+
+  //       // after the above you can also access the auth data from the authStore
+  //       console.log("AuthData", authData);
+  //       if (authData.token) {
+  //         dispatch(
+  //           updateProfile({
+  //             id: record.id,
+  //             name: record.name,
+  //             email: record.email,
+  //             registration_no: record.registration_no,
+  //             section: record.section,
+  //             branch: record.branch,
+  //             token: authData.token,
+  //           })
+  //         );
+  //       }
+  //       // console.log(pb.authStore.token);
+  //     }
+
+  //     console.log(data);
+
+  //     console.log("You are ready to go.");
+  //   } catch (error) {
+  //     if (error instanceof yup.ValidationError) {
+  //       // Optionally map errors to display in the UI
+
+  //       if (error.inner.length > 0) {
+  //         toast.error(error.inner[0].message, {
+  //           position: "top-right",
+  //           autoClose: 3000,
+  //           hideProgressBar: false,
+  //           closeOnClick: true,
+  //           pauseOnHover: true,
+  //           draggable: true,
+  //         });
+  //       }
+  //     } else {
+  //       console.error("Unexpected Error:", error);
+  //     }
+  //   }
+  // };
   const handleSubmit = async () => {
     try {
-      // Validate form data against the schema
+      if (!visitorId) {
+        toast.error("Visitor ID not captured yet. Please refresh the page.");
+        return;
+      }
+
       const validityResponse = await validationSchema.validate(formData, {
         abortEarly: false,
       });
-      console.log(
-        AuthType === "REGISTER" ? "Registration Data:" : "Login Data:",
-        validityResponse
-      );
 
       const data = {
         password: formData.password,
@@ -141,47 +225,51 @@ const RegistrationPage = () => {
         registration_no: formData.registration_no,
         section: formData.section,
         branch: formData.branch,
+        visitor_id: visitorId,
       };
 
       const record = await pb.collection("users").create(data);
-      console.log(record);
+      if (record?.id) {
+        const authData = await pb
+          .collection("users")
+          .authWithPassword(formData.registration_no, formData.password);
 
-      console.log("You are ready to go.");
-    } catch (error) {
+        if (authData.token) {
+          dispatch(
+            updateProfile({
+              id: record.id,
+              name: record.name,
+              email: record.email,
+              registration_no: record.registration_no,
+              section: record.section,
+              branch: record.branch,
+              token: authData.token,
+            })
+          );
+        }
+      }
+
+      toast.success("You are ready to go.");
+      window.location.href = "/";
+    } catch (error: any) {
       if (error instanceof yup.ValidationError) {
-        // Optionally map errors to display in the UI
-
         if (error.inner.length > 0) {
           toast.error(error.inner[0].message, {
             position: "top-right",
             autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
           });
         }
-        // const validationErrors = error.inner.reduce((acc, err) => {
-        //   //@ts-ignore
-        //   acc[err.path] = err.message;
-        //   return acc;
-        // }, {});
-        // console.log("Mapped Errors:", validationErrors);
+      } else if (error.response?.data) {
+        toast.error(
+          error.response.data.message || "Failed to create a record.",
+          { position: "top-right", autoClose: 3000 }
+        );
       } else {
         console.error("Unexpected Error:", error);
       }
     }
-
-    // try {
-
-    //   const record = await pb.collection("users").create(data);
-    //   console.log(record);
-    // } catch (error) {
-    //   console.error(error);
-    // }
   };
 
-  // Get sections for selected branch
   const getSectionsForBranch = (branch: string) => {
     const branchDetail = sectionDetails.find(
       (detail) => detail.branch === branch
@@ -196,13 +284,13 @@ const RegistrationPage = () => {
       {/* Main content */}
       <div className="flex-grow flex items-center justify-center px-4 pt-8">
         <div className="w-full max-w-md bg-white/80 backdrop-blur-lg p-6 rounded-lg shadow-lg">
-          <h1 className="text-3xl font-bold mb-8 text-center">Upashtiti IO</h1>
+          <h1 className="text-3xl font-bold mb-8 text-center">Upashtiti iOS</h1>
 
           <form
             onSubmit={(e) => {
               e.preventDefault();
             }}
-            className="space-y-6 h-[600px] overflow-scroll"
+            className="space-y-6 h-[600px] overflow-y-scroll p-2"
           >
             {AuthType === "REGISTER" && (
               <>
@@ -324,30 +412,75 @@ const RegistrationPage = () => {
                     />
                   </div>
                 </div>
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-lg font-semibold mb-2 text-gray-800"
+                  >
+                    Password
+                  </label>
+                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
+                    <Lock className="mx-2 text-gray-600" />
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="Enter your password"
+                      required
+                      className="w-full py-3 px-4 text-lg bg-transparent"
+                    />
+                  </div>
+                </div>
               </>
             )}
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-lg font-semibold mb-2 text-gray-800"
-              >
-                Password
-              </label>
-              <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
-                <Lock className="mx-2 text-gray-600" />
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Enter your password"
-                  required
-                  className="w-full py-3 px-4 text-lg bg-transparent"
-                />
-              </div>
-            </div>
+            {AuthType === "LOGIN" && (
+              <>
+                <div>
+                  <label
+                    htmlFor="registration_no"
+                    className="block text-lg font-semibold mb-2 text-gray-800"
+                  >
+                    Registration Number
+                  </label>
+                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
+                    <User className="mx-2 text-gray-600" />
+                    <input
+                      type="number"
+                      id="registration_no"
+                      name="registration_no"
+                      value={formData.registration_no}
+                      onChange={handleInputChange}
+                      placeholder="Enter your Registration Number"
+                      required
+                      className="w-full py-3 px-4 text-lg bg-transparent"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-lg font-semibold mb-2 text-gray-800"
+                  >
+                    Password
+                  </label>
+                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
+                    <Lock className="mx-2 text-gray-600" />
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="Enter your password"
+                      required
+                      className="w-full py-3 px-4 text-lg bg-transparent"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             <div>
               <button
@@ -377,6 +510,8 @@ const RegistrationPage = () => {
           </div>
         </div>
       </div>
+      <DeviceFingerprint onVisitorIdCaptured={handleVisitorId} />
+      <p className="text-black">Visitor ID : {visitorId}</p>
     </div>
   );
 };
