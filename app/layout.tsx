@@ -17,20 +17,22 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "My App",
-  description: "This is my awesome app",
-  viewport: "width=device-width, initial-scale=1",
+  title: "Upasthiti-iOS",
+  description: "Created By Dev Verse",
   icons: {
     icon: "/favicon.ico",
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased">
         <RootClient />
         {children}
+        <ToastContainer />
       </body>
     </html>
   );
