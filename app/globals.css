@@ -19,3 +19,7 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+.bg-\[url\(\'\/cover-img\.jpg\'\)\] {
+  background-image: url('/cover-img.jpg');
+}
+

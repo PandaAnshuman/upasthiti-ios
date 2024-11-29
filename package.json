@@ -10,10 +10,15 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.5.1",
+    "@nextui-org/react": "^2.4.8",
+    "cookies-next": "^5.0.2",
+    "framer-motion": "^11.12.0",
+    "lucide": "^0.462.0",
+    "lucide-react": "^0.462.0",
     "mobile-detect": "^1.4.5",
     "next": "^15.0.3",
-    "react": "^19.0.0-rc-66855b96-20241106",
-    "react-dom": "^19.0.0-rc-66855b96-20241106"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.9",
