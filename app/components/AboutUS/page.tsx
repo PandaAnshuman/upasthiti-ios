@@ -6,10 +6,10 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  Avatar,
+  Card,
   useDisclosure,
 } from "@nextui-org/react";
-import { Avatar } from "@nextui-org/react";
-import { Card } from "@nextui-org/react";
 import { ChevronLeft } from "lucide-react";
 import React from "react";
 
@@ -50,89 +50,82 @@ const teamMembers: TeamMember[] = [
 ];
 
 export default function TeamProfile() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Manage modal state
   const [selectedMember, setSelectedMember] = React.useState<TeamMember | null>(
     null
   );
 
-  const handleOpen = (member: TeamMember) => {
-    setSelectedMember(member);
+  // Automatically open the modal when this component is rendered
+  React.useEffect(() => {
     onOpen();
-  };
+  }, [onOpen]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a29] text-white p-4">
-      <div className="space-y-8">
-        {teamMembers.map((member) => (
-          <div key={member.id} className="space-y-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold">{member.name}</h2>
-              <span className="text-yellow-400 text-2xl">⚡</span>
-            </div>
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" className="bg-black">
+      <ModalContent>
+        <ModalHeader className="flex items-center gap-2">
+          <Button
+            isIconOnly
+            className="text-gray-500 hover:text-gray-700"
+            onPress={onClose}
+          >
+            <ChevronLeft size={20} />
+          </Button>
+          <h2 className="text-xl font-semibold">Meet the Team</h2>
+        </ModalHeader>
 
-            <Card
-              className="bg-white p-4 rounded-xl"
-              isPressable
-              onPress={() => handleOpen(member)}
-            >
-              <div className="flex gap-4">
-                <Avatar
-                  src={member.image}
-                  className="w-20 h-20"
-                  alt={member.name}
-                />
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-black">
-                    {member.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm">{member.title}</p>
-                  <Button
-                    className="mt-2 text-blue-600 p-0 h-auto bg-transparent hover:bg-transparent"
-                    variant="light"
-                    onPress={() => handleOpen(member)}
-                  >
-                    Know More
-                  </Button>
-                </div>
+        <ModalBody className="space-y-8">
+          {teamMembers.map((member) => (
+            <div key={member.id} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold">{member.name}</h2>
+                <span className="text-yellow-400 text-2xl">⚡</span>
               </div>
-            </Card>
-          </div>
-        ))}
-      </div>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="lg">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                {selectedMember?.name}
-              </ModalHeader>
-              <ModalBody>
+              <Card
+                className="bg-white p-4 rounded-xl"
+                isPressable
+                onPress={() => setSelectedMember(member)}
+              >
                 <div className="flex gap-4">
                   <Avatar
-                    src={selectedMember?.image}
-                    className="w-24 h-24"
-                    alt={selectedMember?.name || "Team member"}
+                    src={member.image}
+                    className="w-20 h-20"
+                    alt={member.name}
                   />
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      {selectedMember?.title}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-black">
+                      {member.name}
                     </h3>
-                    <p className="text-gray-600 mt-2">
-                      {selectedMember?.description}
-                    </p>
+                    <p className="text-gray-600 text-sm">{member.title}</p>
+                    <Button
+                      className="mt-2 text-blue-600 p-0 h-auto bg-transparent hover:bg-transparent"
+                      variant="light"
+                      onPress={() => setSelectedMember(member)}
+                    >
+                      Know More
+                    </Button>
                   </div>
                 </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-              </ModalFooter>
-            </>
+              </Card>
+            </div>
+          ))}
+
+          {/* Show Selected Member Details */}
+          {selectedMember && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">{selectedMember.name}</h3>
+              <p className="text-gray-600">{selectedMember.description}</p>
+            </div>
           )}
-        </ModalContent>
-      </Modal>
-    </div>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button color="danger" variant="light" onPress={onClose}>
+            Close
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }

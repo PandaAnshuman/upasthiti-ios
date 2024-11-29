@@ -3,10 +3,16 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { ScanQrCode, QrCode, BellRing, Info } from "lucide-react";
 import TeamProfile from "./components/AboutUS/page";
-import { useState } from "react";
+import {
+  Modal,
+  ModalContent,
+  ModalBody,
+  useDisclosure,
+} from "@nextui-org/react";
 
 const Home: NextPage = () => {
-  const [isTeamProfileOpen, setIsTeamProfileOpen] = useState(false); // Modal state
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Modal state using NextUI's useDisclosure
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 flex flex-col items-center justify-start">
       <Head>
@@ -54,42 +60,34 @@ const Home: NextPage = () => {
               <h2 className="text-lg text-black font-bold mb-2">
                 Notifications
               </h2>
-              <p className="text-sm text-gray-600">Get Latest Events</p>{" "}
+              <p className="text-sm text-gray-600">Get Latest Events</p>
             </div>
           </button>
 
-          <button
-            className="flex flex-col items-center p-6 bg-white rounded-2xl shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 w-44 transition-transform transform hover:scale-105"
-            onClick={() => setIsTeamProfileOpen(true)} // Open modal on click
+          {/* "About" div to open the TeamProfile modal on click */}
+          <div
+            className="flex flex-col items-center p-6 bg-white rounded-2xl shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 w-44 transition-transform transform hover:scale-105 cursor-pointer"
+            onClick={onOpen} // Open modal on div click
           >
             <div className="mb-4 flex justify-center">
               <Info size={56} fill="#FFD700" />
             </div>
             <div className="text-center">
               <h2 className="text-lg text-black font-bold mb-2">About</h2>
-              <p className="text-sm text-gray-600">Know The Creators</p>{" "}
-            </div>
-          </button>
-        </div>
-      </div>
-
-      {isTeamProfileOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div>
-            {/* TeamProfile Component */}
-            <TeamProfile />
-            {/* Close button */}
-            <div className="flex justify-end">
-              <button
-                className="text-red-500 text-lg font-semibold"
-                onClick={() => setIsTeamProfileOpen(false)} // Close modal
-              >
-                Close
-              </button>
+              <p className="text-sm text-gray-600">Know The Creators</p>
             </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* TeamProfile Modal */}
+      <Modal isOpen={isOpen} onClose={onClose} size="lg" className="bg-gray-50">
+        <ModalContent>
+          <ModalBody>
+            <TeamProfile />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
