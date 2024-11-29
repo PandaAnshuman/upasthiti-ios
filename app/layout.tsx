@@ -1,43 +1,36 @@
-"use client";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import localFont from "next/font/local";
 import "./globals.css";
-import { useEffect } from "react";
-import disableDevtool from "disable-devtool";
+import RootClient from "./RootClient";
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
 });
 
+export const metadata = {
+  title: "My App",
+  description: "This is my awesome app",
+  viewport: "width=device-width, initial-scale=1",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
 
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  useEffect(() => {
-    disableDevtool();
-  });
-
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="antialiased">
+        <RootClient />
         {children}
-        <ToastContainer />
-        <script
-          disable-devtool-auto
-          src="https://cdn.jsdelivr.net/npm/disable-devtool@0.2.6/disable-devtool.min.js#use"
-        ></script>
       </body>
     </html>
   );
