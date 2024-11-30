@@ -8,6 +8,7 @@ import DeviceFingerprint from "../components/DeviceFingerprint";
 import { resetProfile, updateProfile } from "@/redux/features/profile-slice";
 import { useDispatch } from "react-redux";
 import { AppDispatch, useAppSelector } from "@/redux/store";
+import { setCookie } from "cookies-next";
 const RegistrationPage = () => {
   const [AuthType, setAuthType] = useState<"REGISTER" | "LOGIN">("REGISTER");
   const [formData, setFormData] = useState({
@@ -133,6 +134,35 @@ const RegistrationPage = () => {
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      const loginData = await pb
+        .collection("users")
+        .authWithPassword(formData.registration_no, formData.password);
+
+      if (loginData.token) {
+        setCookie("token", loginData.token, {
+          maxAge: 60 * 60 * 24 * 30.44 * 7,
+        });
+        dispatch(
+          updateProfile({
+            id: loginData.record.id,
+            name: loginData.record.name,
+            email: loginData.record.email,
+            registration_no: loginData.record.registration_no,
+            section: loginData.record.section,
+            branch: loginData.record.branch,
+            token: loginData.token,
+          })
+        );
+        toast.success("Logged in successfully.");
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
+  };
+
   // const handleSubmit = async () => {
   //   try {
   //     // Validate form data against the schema
@@ -246,11 +276,14 @@ const RegistrationPage = () => {
               token: authData.token,
             })
           );
+          setCookie("token", authData.token, {
+            maxAge: 60 * 60 * 24 * 30.44 * 7,
+          });
         }
       }
 
       toast.success("You are ready to go.");
-      window.location.href = "/";
+      window.location.href = "/privacy";
     } catch (error: any) {
       if (error instanceof yup.ValidationError) {
         if (error.inner.length > 0) {
@@ -481,16 +514,28 @@ const RegistrationPage = () => {
                 </div>
               </>
             )}
-
-            <div>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="w-full py-3 px-6 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
-              >
-                {AuthType === "REGISTER" ? "Register" : "Login"}
-              </button>
-            </div>
+            {AuthType === "REGISTER" && (
+              <div>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="w-full py-3 px-6 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
+                >
+                  Register
+                </button>
+              </div>
+            )}
+            {AuthType === "LOGIN" && (
+              <div>
+                <button
+                  type="button"
+                  onClick={handleLogin}
+                  className="w-full py-3 px-6 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
+                >
+                  Login
+                </button>
+              </div>
+            )}
           </form>
 
           <div className="text-center mt-4">

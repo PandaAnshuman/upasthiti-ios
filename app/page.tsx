@@ -13,27 +13,63 @@ import {
 import { useState } from "react";
 import DeviceFingerprint from "./components/DeviceFingerprint";
 import { useAppSelector } from "@/redux/store";
+import { getCookie } from "cookies-next";
 
 const Home: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [data, setData] = useState("");
+  const [data, setData] = useState(""); // State for scanned data
   const [isScannerActive, setIsScannerActive] = useState(false); // State to control scanner visibility
   const [isQrVisible, setIsQrVisible] = useState(false); // State to control QR Code visibility
-
+  const [attendanceMessage, setAttendanceMessage] = useState(""); // State for showing the attendance message
+  const token = getCookie("token"); // Get the token from the cookie
+  // console.log("Token:", token);
   const [visitorId, setVisitorId] = useState<string>("");
 
   const handleVisitorId = (id: string) => {
     setVisitorId(id);
     console.log("Captured Visitor ID:", id);
-    // You can also send this ID to your backend or use it further in the app
   };
 
   const regdNum = useAppSelector(
     (state) => state.profileReducer.value.registration_no
   );
   const name = useAppSelector((state) => state.profileReducer.value.name);
-  const value = regdNum + name;
-  console.log(value);
+  const value = regdNum + name; // Combine values for QR Code
+  console.log("QR Code Value:", value);
+
+  // Function to handle API call for attendance
+  const giveAttendance = async (data: string) => {
+    try {
+      const headersList = {
+        Accept: "*/*",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+      let bodyContent = JSON.stringify({
+        jwt: data,
+      });
+
+      const response = await fetch(
+        "http://127.0.0.1:8090/api/give-attendance",
+        {
+          method: "POST",
+          headers: headersList,
+          body: bodyContent,
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        setAttendanceMessage(responseData.message); // Set the message from the API response
+      } else {
+        setAttendanceMessage("Failed to mark attendance. Try again.");
+      }
+    } catch (error) {
+      console.error("Error marking attendance:", error);
+      setAttendanceMessage("An error occurred while marking attendance.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 flex flex-col items-center justify-start">
@@ -50,7 +86,6 @@ const Home: NextPage = () => {
       </div>
 
       <div className="w-full max-w-xl space-y-4 px-6">
-        {/* Scan QR Button */}
         <button
           onClick={() => setIsScannerActive(true)} // Activate scanner on click
           className="flex w-full items-center p-5 bg-yellow-400 text-black rounded-2xl shadow-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
@@ -70,23 +105,43 @@ const Home: NextPage = () => {
             <Scanner
               onScan={(result) => {
                 if (result) {
-                  console.log(result);
-                  setData((result as any).text); // Using type cast as a workaround
-                  setIsScannerActive(false); // Close scanner after scanning
+                  console.log("Scan Result:", result);
+                  const scannedData = result[0]?.rawValue;
+                  if (scannedData) {
+                    console.log("Scanned Data:", scannedData); // Log the scanned data
+                    setData(scannedData); // Store the rawValue data in state
+                    giveAttendance(data);
+                  }
+                  setIsScannerActive(false); // Deactivate scanner after scanning
                 }
               }}
+              onError={(error) => {
+                console.error("Scan Error:", error); // Handle scanner errors
+              }}
+              scanDelay={500} // Optional: Adds a delay between scans
             />
+
             <button
-              onClick={() => setIsScannerActive(false)} // Deactivate scanner manually
+              onClick={() => setIsScannerActive(false)} // Close scanner manually
               className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
             >
               Close Scanner
             </button>
           </div>
         )}
-        <p className="text-black">{data}</p>
 
-        {/* Show QR Button */}
+        {/* Show Attendance Message */}
+        {attendanceMessage && (
+          <div className="w-full max-w-md p-4 bg-green-100 rounded-md shadow-md mt-4">
+            <h2 className="text-lg font-semibold text-black">
+              Attendance Status
+            </h2>
+            <p className="text-base text-gray-700 break-words">
+              {attendanceMessage}
+            </p>
+          </div>
+        )}
+
         <button
           onClick={() => setIsQrVisible(true)} // Show QR Code on click
           className="flex w-full items-center p-5 bg-blue-400 text-black rounded-2xl shadow-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -101,7 +156,6 @@ const Home: NextPage = () => {
         </button>
       </div>
 
-      {/* Conditional QR Code Display */}
       {isQrVisible && regdNum ? (
         <>
           <QRCode
@@ -115,9 +169,9 @@ const Home: NextPage = () => {
           />
           <button
             onClick={() => setIsQrVisible(false)}
-            className=" bg-red-500 text-white rounded-full px-2 py-1 text-sm"
+            className="bg-red-500 text-white rounded-full px-2 py-1 text-sm"
           >
-            Close Qr
+            Close QR
           </button>
         </>
       ) : null}
@@ -161,7 +215,7 @@ const Home: NextPage = () => {
       </Modal>
 
       <DeviceFingerprint onVisitorIdCaptured={handleVisitorId} />
-      <p className="text-black">Visitor ID : {visitorId}</p>
+      <p className="text-black">Visitor ID: {visitorId}</p>
     </div>
   );
 };
