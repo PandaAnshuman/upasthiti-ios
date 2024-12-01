@@ -39,7 +39,7 @@ const Home: NextPage = () => {
   console.log("QR Code Value:", value);
 
   // Function to handle API call for attendance
-  const giveAttendance = async (data: string) => {
+  const giveAttendance = async (scannedToken: string) => {
     try {
       const headersList = {
         Accept: "*/*",
@@ -47,7 +47,7 @@ const Home: NextPage = () => {
         "Content-Type": "application/json",
       };
       let bodyContent = JSON.stringify({
-        jwt: data,
+        jwt: scannedToken,
       });
 
       const response = await fetch(
@@ -111,7 +111,7 @@ const Home: NextPage = () => {
                   if (scannedData) {
                     console.log("Scanned Data:", scannedData); // Log the scanned data
                     setData(scannedData); // Store the rawValue data in state
-                    giveAttendance(data);
+                    giveAttendance(scannedData);
                   }
                   setIsScannerActive(false); // Deactivate scanner after scanning
                 }
