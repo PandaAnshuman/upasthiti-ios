@@ -34,17 +34,17 @@ export default function RootClient() {
     window.addEventListener("keydown", handleKeyPress);
 
     // Check if DevTools is open
-    const checkDevTools = () => {
-      const width = window.outerWidth - window.innerWidth > 100;
-      const height = window.outerHeight - window.innerHeight > 100;
+    // const checkDevTools = () => {
+    //   const width = window.outerWidth - window.innerWidth > 100;
+    //   const height = window.outerHeight - window.innerHeight > 100;
 
-      if (width || height) {
-        alert("Developer Tools detected!");
-      }
-    };
+    //   if (width || height) {
+    //     alert("Developer Tools detected!");
+    //   }
+    // };
 
     // Store the interval ID
-    const intervalId = setInterval(checkDevTools, 1000);
+    // const intervalId = setInterval(checkDevTools, 1000);
 
     // Disable text selection
     document.body.style.userSelect = "none";
@@ -52,7 +52,7 @@ export default function RootClient() {
     // Cleanup function
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
-      clearInterval(intervalId); // Use the stored intervalId to clear the interval
+      // clearInterval(intervalId); // Use the stored intervalId to clear the interval
       document.body.style.userSelect = "auto";
     };
   }, []);
