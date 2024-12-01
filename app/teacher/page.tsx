@@ -1,24 +1,26 @@
 "use client";
+import pb from "@/utils/pocketbase";
 import React, { useState, useEffect } from "react";
 import QRCode from "react-qr-code";
 
 const Page = () => {
-  const [tokens, setTokens] = useState<string[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [jwtExpirations, setJwtExpirations] = useState<any[]>([]); // Store the jwtExpirations array
 
-  const fetchTokens = async () => {
+  // Function to fetch tokens from the API
+
+  const fetchTokens = async (token: string) => {
     try {
-      setError(null); // Clear previous errors
+      setError(null);
       const headersList = {
         Accept: "*/*",
-        "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzYxNDE3MDc0NCIsImV4cCI6MTczMzU2ODIxOCwiaWQiOiJ2Z3Y1NDg3bDVhbWp3cnoiLCJyZWZyZXNoYWJsZSI6dHJ1ZSwidHlwZSI6ImF1dGgifQ.XGezTvYKE5mgv2Y7zo3h9VvchA83AHoSp7KQnz5_Mko",
+        // "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+        Authorization: `Bearer ${token}`,
       };
 
       const response = await fetch(
-        "http://127.0.0.1:8090/api/take-attendance/true",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/take-attendance/true`,
         {
           method: "GET",
           headers: headersList,
@@ -30,7 +32,7 @@ const Page = () => {
       }
 
       const data = await response.json(); // Assuming the response is JSON
-      setTokens(data.tokens || []); // Store tokens array
+      setJwtExpirations(data.jwtExpirations || []); // Store the jwtExpirations array from the response
     } catch (err) {
       console.error(err);
       setError("Failed to fetch tokens");
@@ -38,58 +40,66 @@ const Page = () => {
   };
 
   useEffect(() => {
-    fetchTokens(); // Fetch tokens only once on component mount
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get("teacher"); // Get the 'id' query parameter
+    // Fetch tokens only once on component mount
+    if (token) {
+      fetchTokens(token);
+    }
   }, []);
 
-  useEffect(() => {
-    if (tokens.length > 0) {
-      const intervalId = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % tokens.length);
-      }, 30000);
+  let lastValidToken = ""; // Store the last valid token
+  let intervalId: any; // Variable to store the interval ID
 
-      return () => clearInterval(intervalId);
+  // Function to start checking for the valid token
+  function startTokenCheck() {
+    intervalId = setInterval(() => {
+      const currentTimestamp = Math.floor(Date.now() / 1000); // Update the current time every interval
+
+      // Find the valid token by comparing timestamps
+      const validToken = jwtExpirations.find(
+        (item) => item.activeTimestamp >= currentTimestamp
+      );
+
+      if (validToken) {
+        if (lastValidToken !== validToken.token) {
+          setToken(validToken.token);
+          console.log("Valid Token Found:", validToken.token); // Log valid token if it's different
+          lastValidToken = validToken.token;
+        }
+      } else {
+        console.log("No valid token found yet.");
+      }
+    }, 1000); // Check every 1 second
+  }
+
+  // Function to stop checking for the valid token
+  function stopTokenCheck() {
+    clearInterval(intervalId); // Stop the interval when required
+    console.log("Token check stopped.");
+  }
+
+  useEffect(() => {
+    if (jwtExpirations.length > 0) {
+      startTokenCheck(); // Start token checking once tokens are fetched
     }
-  }, [tokens]);
-  const extra = "WEHVGFiegfilaEFGIawfguyWQUIEYGFWuyfgaYUEFGWAYF";
+    return () => clearInterval(intervalId); // Clean up on component unmount
+  }, [jwtExpirations]); // Trigger effect when jwtExpirations changes
+
   return (
     <div
-      className="bg-white text-center"
+      className="bg-white text-center justify-center items-center flex h-screen"
       style={{ textAlign: "center", padding: "20px" }}
     >
       <h1>Dynamic QR Code</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      {tokens.length > 0 ? (
+      {token ? (
         <div>
-          <QRCode value={tokens[currentIndex]} size={356} />
-
-          <p className="text-black">
-            Token {currentIndex + 1} of {tokens.length}
-            {tokens[currentIndex]}
-          </p>
+          <QRCode bgColor="white" fgColor="black" value={token} size={700} />
         </div>
       ) : (
         <p>{error ? "Error loading QR codes" : "Loading QR codes..."}</p>
       )}
-
-      <div style={{ marginTop: "20px" }}>
-        <button
-          onClick={() =>
-            setCurrentIndex(
-              (prev) => (prev - 1 + tokens.length) % tokens.length
-            )
-          }
-          disabled={tokens.length === 0}
-          style={{ marginRight: "10px" }}
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => setCurrentIndex((prev) => (prev + 1) % tokens.length)}
-          disabled={tokens.length === 0}
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 };

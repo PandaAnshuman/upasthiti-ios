@@ -14,6 +14,7 @@ import { useState } from "react";
 import DeviceFingerprint from "./components/DeviceFingerprint";
 import { useAppSelector } from "@/redux/store";
 import { getCookie } from "cookies-next";
+import pb from "@/utils/pocketbase";
 
 const Home: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -50,7 +51,7 @@ const Home: NextPage = () => {
       });
 
       const response = await fetch(
-        "http://127.0.0.1:8090/api/give-attendance",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/give-attendance`,
         {
           method: "POST",
           headers: headersList,

@@ -5,9 +5,9 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import DeviceFingerprint from "../components/DeviceFingerprint";
-import { resetProfile, updateProfile } from "@/redux/features/profile-slice";
+import { updateProfile } from "@/redux/features/profile-slice";
 import { useDispatch } from "react-redux";
-import { AppDispatch, useAppSelector } from "@/redux/store";
+import { AppDispatch } from "@/redux/store";
 import { setCookie } from "cookies-next";
 const RegistrationPage = () => {
   const [AuthType, setAuthType] = useState<"REGISTER" | "LOGIN">("REGISTER");
