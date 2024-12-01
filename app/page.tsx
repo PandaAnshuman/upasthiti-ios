@@ -119,7 +119,7 @@ const Home: NextPage = () => {
               onError={(error) => {
                 console.error("Scan Error:", error); // Handle scanner errors
               }}
-              scanDelay={500} // Optional: Adds a delay between scans
+              scanDelay={500} // Adds a delay between scans
             />
 
             <button
