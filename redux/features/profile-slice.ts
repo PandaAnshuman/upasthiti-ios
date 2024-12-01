@@ -12,7 +12,9 @@ type UserProfileState = {
     token: string;
     section: string;
     branch: string;
+    dateAttended:string
 };
+
 
 const initialState = {
     value: {
@@ -22,11 +24,11 @@ const initialState = {
        name:"",
        token:"",
        section:"",
-       branch:""
-
-        
+       branch:"",
+       dateAttended: "",
     } as UserProfileState,
 } as InitialState;
+
 
 export const profile = createSlice({
     name: 'profile',

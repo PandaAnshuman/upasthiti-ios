@@ -11,10 +11,10 @@ export default function RootClient() {
 
     // Block F12 key
     const handleKeyPress = (event: any) => {
-      if (event.key === "F12") {
-        event.preventDefault();
-        alert("F12 is disabled!");
-      }
+      // if (event.key === "F12") {
+      //   event.preventDefault();
+      //   alert("F12 is disabled!");
+      // }
       if (
         (event.ctrlKey || event.metaKey) && // For Mac (Cmd)
         event.shiftKey &&
