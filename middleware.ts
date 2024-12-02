@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
 import { getCookie } from 'cookies-next';
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const userAgent = request.headers.get('user-agent') || '';
-  const token =getCookie('token'); // Get the token from cookies
+  const token = getCookie('token'); // Get the token from cookies
 
   // Exclude static assets from middleware processing
   // if (url.pathname.startsWith('/_next') || url.pathname.startsWith('/static')) {
@@ -23,13 +22,13 @@ export function middleware(request: NextRequest) {
   //   return NextResponse.redirect(new URL('/not-allowed', url));
   // }
 
-  // Check if the user is authenticated
-  // if (!token) {
-  //   // Redirect the user to /register if token is not found
-  //   return NextResponse.redirect(new URL('/register', url));
+  // Check if the user is authenticated (token exists)
+  // If no token and not on the '/auth' page, redirect to '/auth'
+  // if (!token && !url.pathname.startsWith('/auth')) {
+  //   return NextResponse.redirect(new URL('/auth', url));
   // }
 
-  // Allow the user to proceed if the token is valid
+  // Allow the user to proceed if they have a valid token or are on the '/auth' page
   return NextResponse.next();
 }
 

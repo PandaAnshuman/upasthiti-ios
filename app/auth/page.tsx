@@ -9,6 +9,7 @@ import { updateProfile } from "@/redux/features/profile-slice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { setCookie } from "cookies-next";
+
 const RegistrationPage = () => {
   const [AuthType, setAuthType] = useState<"REGISTER" | "LOGIN">("REGISTER");
   const [formData, setFormData] = useState({
@@ -55,7 +56,7 @@ const RegistrationPage = () => {
     },
     {
       branch: "MCA",
-      sections: ["A1", "C1", "D1", "D", "E", "F", "C2"],
+      sections: ["A1", "A2", "B1", "B2", "C1"],
     },
     {
       branch: "EEE",
@@ -434,7 +435,7 @@ const RegistrationPage = () => {
                   <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
                     <Link className="mx-2 text-gray-600" />
                     <input
-                      type="text"
+                      type={formData.branch === "MCA" ? "text" : "number"}
                       id="registration_no"
                       name="registration_no"
                       value={formData.registration_no}
