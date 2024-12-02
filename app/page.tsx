@@ -56,7 +56,7 @@ const Home: NextPage = () => {
     (state) => state.profileReducer.value.dateAttended
   );
   // console.log(dateAttended);
-  const giveAttendance = async (data: string) => {
+  const giveAttendance = async (scannedData: string) => {
     console.log("API HIT...");
     try {
       const headersList = {
@@ -65,7 +65,7 @@ const Home: NextPage = () => {
         "Content-Type": "application/json",
       };
       let bodyContent = JSON.stringify({
-        jwt: data,
+        jwt: scannedData,
       });
 
       const response = await fetch(
@@ -98,6 +98,10 @@ const Home: NextPage = () => {
       setisAttendanceGiving(false);
     }
   };
+  // console.log(dateAttended);
+
+  // const isEligible = dateAttended === todaysDate ? false : true;
+  // console.log(isEligible);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 p-6 flex flex-col items-center justify-between relative overflow-hidden">
@@ -145,6 +149,15 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
+        {/* {isEligible ? (
+          <>
+            <p className="text-white">Eligible</p>
+          </>
+        ) : (
+          <>
+            <p className="text-white">Not Eligible</p>
+          </>
+        )} */}
 
         {/* Scan QR and Show QR Buttons */}
         {!isQrVisible && id && (
@@ -284,7 +297,7 @@ const Home: NextPage = () => {
       {/* About Button */}
       <div className="fixed bottom-4 right-4 z-50">
         <a
-          href="/about"
+          href="/about-us"
           className="group flex flex-col items-center justify-center p-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg hover:from-yellow-500 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 w-20 h-20 transition-all duration-300 transform hover:scale-110"
           aria-label="About Upasthiti-iOS"
         >
