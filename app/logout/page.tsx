@@ -9,7 +9,6 @@ import { deleteCookie } from "cookies-next";
 
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
-
   useEffect(() => {
     pb.authStore.clear();
     deleteCookie("token");

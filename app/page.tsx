@@ -10,6 +10,7 @@ import {
   Clock,
   ChevronRight,
   Zap,
+  CheckCircle,
 } from "lucide-react";
 import TeamProfile from "./components/About-us/page";
 import { Scanner } from "@yudiel/react-qr-scanner";
@@ -40,9 +41,9 @@ const Home: NextPage = () => {
   const [visitorId, setVisitorId] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
   const todaysDate = new Date().toISOString().split("T")[0];
+  // console.log(todaysDate);
   const handleVisitorId = (id: string) => {
     setVisitorId(id);
-    // console.log("Captured Visitor ID:", id);
   };
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -53,10 +54,10 @@ const Home: NextPage = () => {
 
   const id = useAppSelector((state) => state.profileReducer.value.id);
   const name = useAppSelector((state) => state.profileReducer.value.name);
-  const dateAttended = useAppSelector(
-    (state) => state.profileReducer.value.dateAttended
+  const lastAttended = useAppSelector(
+    (state) => state.profileReducer.value.lastAttended
   );
-  // console.log(dateAttended);
+  // console.log(lastAttended);
   const giveAttendance = async (scannedData: string) => {
     console.log("API HIT...");
     try {
@@ -85,10 +86,9 @@ const Home: NextPage = () => {
         setIsScannerActive(false);
         dispatch(
           updateProfile({
-            dateAttended: new Date().toISOString().split("T")[0],
+            lastAttended: new Date().toISOString().split("T")[0],
           })
         );
-        // console.log(currentDate);
       } else {
         setAttendanceMessage("Failed to mark attendance. Try again.");
       }
@@ -99,11 +99,12 @@ const Home: NextPage = () => {
       setisAttendanceGiving(false);
     }
   };
-  // console.log(dateAttended);
+  const isEligible = todaysDate === lastAttended ? false : true;
 
-  // const isEligible = dateAttended === todaysDate ? false : true;
+  // console.log(lastAttended);
+  // console.log("today's date", todaysDate);
+  // console.log(lastAttended);
   // console.log(isEligible);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 p-6 flex flex-col items-center justify-between relative overflow-hidden">
       {/* Animated background */}
@@ -154,132 +155,140 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
-        {/* {isEligible ? (
+        {isEligible ? (
           <>
-            <p className="text-white">Eligible</p>
+            {/* Scan QR and Show QR Buttons */}
+            {!isQrVisible && id && (
+              <div className="space-y-4">
+                {!isScannerActive && (
+                  <button
+                    onClick={() => setIsScannerActive(true)}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-xl shadow-lg p-6 transition-all duration-300 transform hover:scale-105 hover:rotate-1 group"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="text-left">
+                        <h2 className="text-2xl font-bold m-0">Scan QR</h2>
+                        <p className="text-sm opacity-80">
+                          Open It For Attendance
+                        </p>
+                      </div>
+                      <ScanQrCode className="w-10 h-10 transition-transform duration-300 group-hover:rotate-12" />
+                    </div>
+                  </button>
+                )}
+
+                {!isScannerActive && (
+                  <button
+                    onClick={() => setIsQrVisible(true)}
+                    className="w-full bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white rounded-xl shadow-lg p-6 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 group"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="text-left">
+                        <h2 className="text-2xl font-bold m-0">Show QR</h2>
+                        <p className="text-sm opacity-80">
+                          Show it only to your faculty
+                        </p>
+                      </div>
+                      <QrCode className="w-10 h-10 transition-transform duration-300 group-hover:rotate-90" />
+                    </div>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* QR Scanner */}
+            {isScannerActive && (
+              <div className="w-full flex flex-col items-center space-y-4 relative">
+                {isAttendanceGiving && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10 rounded-xl">
+                    <p className="text-white text-xl font-bold">Verifying...</p>
+                  </div>
+                )}
+                <div className="w-full aspect-square relative overflow-hidden rounded-xl">
+                  <Scanner
+                    formats={["qr_code"]}
+                    allowMultiple={true}
+                    paused={isAttendanceGiving}
+                    onScan={(result) => {
+                      if (result) {
+                        console.log("Scan Result:", result);
+                        const scannedData = result[0]?.rawValue;
+                        if (scannedData) {
+                          setisAttendanceGiving(true);
+                          console.log("Scanned Data:", scannedData);
+                          setData(scannedData);
+                          giveAttendance(scannedData);
+                        }
+                      }
+                    }}
+                    onError={(error) => {
+                      console.error("Scan Error:", error);
+                    }}
+                    scanDelay={1000}
+                  />
+                </div>
+                <button
+                  onClick={() => setIsScannerActive(false)}
+                  className="bg-red-500 text-white rounded-full px-4 py-2 flex items-center space-x-2"
+                >
+                  <CircleX size={24} />
+                  <span>{isAttendanceGiving ? "Verifying..." : "Close"}</span>
+                </button>
+              </div>
+            )}
+
+            {/* QR Code Display */}
+            {isQrVisible && id && (
+              <div className="flex flex-col items-center space-y-4">
+                <div className="bg-white p-4 rounded-xl shadow-lg">
+                  <QRCode
+                    size={256}
+                    style={{
+                      height: "auto",
+                      maxWidth: "100%",
+                      width: "100%",
+                    }}
+                    value={id}
+                    viewBox={`0 0 256 256`}
+                  />
+                </div>
+                <button
+                  onClick={() => setIsQrVisible(false)}
+                  className="bg-red-500 text-white rounded-full px-4 py-2 flex items-center space-x-2"
+                >
+                  <CircleX size={24} />
+                  <span>Close</span>
+                </button>
+              </div>
+            )}
+            {/* Attendance Message */}
+            {attendanceMessage && (
+              <div className="w-full p-4 bg-green-100 rounded-xl shadow-md">
+                <h2 className="text-lg font-semibold text-green-800">
+                  Attendance Status
+                </h2>
+                <p className="text-base text-green-700 break-words">
+                  {attendanceMessage}
+                </p>
+              </div>
+            )}
           </>
         ) : (
           <>
-            <p className="text-white">Not Eligible</p>
+            <div className="w-full p-4 h-30 bg-green-100 rounded-xl shadow-md">
+              <h2 className="text-lg font-semibold text-green-800 flex items-center">
+                <Calendar className="mr-2 text-green-800" />
+                Attendance Status
+              </h2>
+              <p className="text-base text-green-700 break-words flex items-center">
+                <CheckCircle className="mr-2 text-green-700" />
+                You have already marked your attendance for today.
+              </p>
+            </div>
           </>
-        )} */}
-
-        {/* Scan QR and Show QR Buttons */}
-        {!isQrVisible && id && (
-          <div className="space-y-4">
-            {!isScannerActive && (
-              <button
-                onClick={() => setIsScannerActive(true)}
-                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-xl shadow-lg p-6 transition-all duration-300 transform hover:scale-105 hover:rotate-1 group"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="text-left">
-                    <h2 className="text-2xl font-bold m-0">Scan QR</h2>
-                    <p className="text-sm opacity-80">Open It For Attendance</p>
-                  </div>
-                  <ScanQrCode className="w-10 h-10 transition-transform duration-300 group-hover:rotate-12" />
-                </div>
-              </button>
-            )}
-
-            {!isScannerActive && (
-              <button
-                onClick={() => setIsQrVisible(true)}
-                className="w-full bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white rounded-xl shadow-lg p-6 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 group"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="text-left">
-                    <h2 className="text-2xl font-bold m-0">Show QR</h2>
-                    <p className="text-sm opacity-80">
-                      Show it only to your faculty
-                    </p>
-                  </div>
-                  <QrCode className="w-10 h-10 transition-transform duration-300 group-hover:rotate-90" />
-                </div>
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* QR Scanner */}
-        {isScannerActive && (
-          <div className="w-full flex flex-col items-center space-y-4 relative">
-            {isAttendanceGiving && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10 rounded-xl">
-                <p className="text-white text-xl font-bold">Verifying...</p>
-              </div>
-            )}
-            <div className="w-full aspect-square relative overflow-hidden rounded-xl">
-              <Scanner
-                formats={["qr_code"]}
-                allowMultiple={true}
-                paused={isAttendanceGiving}
-                onScan={(result) => {
-                  if (result) {
-                    console.log("Scan Result:", result);
-                    const scannedData = result[0]?.rawValue;
-                    if (scannedData) {
-                      setisAttendanceGiving(true);
-                      console.log("Scanned Data:", scannedData);
-                      setData(scannedData);
-                      giveAttendance(scannedData);
-                    }
-                  }
-                }}
-                onError={(error) => {
-                  console.error("Scan Error:", error);
-                }}
-                scanDelay={1000}
-              />
-            </div>
-            <button
-              onClick={() => setIsScannerActive(false)}
-              className="bg-red-500 text-white rounded-full px-4 py-2 flex items-center space-x-2"
-            >
-              <CircleX size={24} />
-              <span>{isAttendanceGiving ? "Verifying..." : "Close"}</span>
-            </button>
-          </div>
-        )}
-
-        {/* QR Code Display */}
-        {isQrVisible && id && (
-          <div className="flex flex-col items-center space-y-4">
-            <div className="bg-white p-4 rounded-xl shadow-lg">
-              <QRCode
-                size={256}
-                style={{
-                  height: "auto",
-                  maxWidth: "100%",
-                  width: "100%",
-                }}
-                value={id}
-                viewBox={`0 0 256 256`}
-              />
-            </div>
-            <button
-              onClick={() => setIsQrVisible(false)}
-              className="bg-red-500 text-white rounded-full px-4 py-2 flex items-center space-x-2"
-            >
-              <CircleX size={24} />
-              <span>Close</span>
-            </button>
-          </div>
-        )}
-
-        {/* Attendance Message */}
-        {attendanceMessage && (
-          <div className="w-full p-4 bg-green-100 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold text-green-800">
-              Attendance Status
-            </h2>
-            <p className="text-base text-green-700 break-words">
-              {attendanceMessage}
-            </p>
-          </div>
         )}
       </div>
-      <div className="bg-white dark:bg-gray-500 rounded-xl shadow-lg w-full max-w-md p-6 mt-5">
+      <div className="bg-white dark:bg-gray-500 rounded-xl shadow-lg w-full max-w-md p-6 ">
         <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
           Quick Links
         </h3>

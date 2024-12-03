@@ -12,7 +12,7 @@ type UserProfileState = {
     token: string;
     section: string;
     branch: string;
-    dateAttended:string
+    lastAttended:string
 };
 
 
@@ -25,7 +25,7 @@ const initialState = {
        token:"",
        section:"",
        branch:"",
-       dateAttended: "",
+       lastAttended: "",
     } as UserProfileState,
 } as InitialState;
 
@@ -39,7 +39,12 @@ export const profile = createSlice({
             state.value = { ...state.value, ...action.payload };
         },
        
-        resetProfile: () => initialState, // Reset profile to initial state
+        resetProfile: (state) => {
+            state.value = {
+              ...initialState.value,
+              lastAttended: state.value.lastAttended, // Preserve the lastAttended field
+            };
+          },// Reset profile to initial state
     },
 });
 

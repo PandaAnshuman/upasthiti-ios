@@ -22,7 +22,7 @@ const RegistrationPage = () => {
     email: "",
     registration_no: "",
   });
-  const [visitorId, setVisitorId] = useState<string>("");
+  const [vid, setvid] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
 
   const branches = [
@@ -56,8 +56,8 @@ const RegistrationPage = () => {
   ];
 
   const handleVisitorId = (id: string) => {
-    if (!visitorId) {
-      setVisitorId(id);
+    if (!vid) {
+      setvid(id);
       console.log("Captured Visitor ID:", id);
     }
   };
@@ -114,6 +114,7 @@ const RegistrationPage = () => {
         setCookie("token", loginData.token, {
           maxAge: 60 * 60 * 24 * 30.44 * 7,
         });
+        console.log("Logged in successfully:", loginData.token);
         dispatch(
           updateProfile({
             id: loginData.record.id,
@@ -136,7 +137,7 @@ const RegistrationPage = () => {
 
   const handleSubmit = async () => {
     try {
-      if (!visitorId) {
+      if (!vid) {
         toast.error("Visitor ID not captured yet. Please refresh the page.");
         return;
       }
@@ -146,7 +147,7 @@ const RegistrationPage = () => {
       const data = {
         ...formData,
         passwordConfirm: formData.password,
-        visitor_id: visitorId,
+        visitor_id: vid,
       };
 
       const record = await pb.collection("users").create(data);
@@ -352,7 +353,7 @@ const RegistrationPage = () => {
         transition={{ delay: 0.5 }}
         className="mt-8 text-sm text-center text-gray-500 dark:text-gray-400"
       >
-        Visitor ID: {visitorId}
+        Visitor ID: {vid}
       </motion.p>
     </div>
   );
