@@ -9,6 +9,7 @@ import {
   Calendar,
   Clock,
   ChevronRight,
+  Zap,
 } from "lucide-react";
 import TeamProfile from "./components/About-us/page";
 import { Scanner } from "@yudiel/react-qr-scanner";
@@ -115,9 +116,13 @@ const Home: NextPage = () => {
         {/* Header Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-105">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4">
-            <h1 className="text-white text-sm font-semibold mb-1">
-              Upasthiti-iOS
+            <h1 className=" flex gap-x-2 text-white text-lg font-semibold mb-1">
+              Upasthiti-iOS{" "}
+              <span>
+                <Zap className="w-6 h-6 text-yellow-400" />
+              </span>
             </h1>
+
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-white text-xl font-semibold m-0">Hi,</h3>

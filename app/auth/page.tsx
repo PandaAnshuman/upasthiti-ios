@@ -1,17 +1,19 @@
 "use client";
-import pb from "@/utils/pocketbase";
-import { Link, User, Lock, Mail } from "lucide-react";
-import React, { useState } from "react";
+
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import * as yup from "yup";
+import { setCookie } from "cookies-next";
+import { User, Lock, Mail, BookOpen, Users, Hash, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import pb from "@/utils/pocketbase";
 import DeviceFingerprint from "../components/DeviceFingerprint";
 import { updateProfile } from "@/redux/features/profile-slice";
-import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import { setCookie } from "cookies-next";
 
 const RegistrationPage = () => {
-  const [AuthType, setAuthType] = useState<"REGISTER" | "LOGIN">("REGISTER");
+  const [authType, setAuthType] = useState<"REGISTER" | "LOGIN">("REGISTER");
   const [formData, setFormData] = useState({
     name: "",
     branch: "",
@@ -22,6 +24,7 @@ const RegistrationPage = () => {
   });
   const [visitorId, setVisitorId] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
+
   const branches = [
     "CSE",
     "CSIT",
@@ -42,39 +45,16 @@ const RegistrationPage = () => {
         26, 27, 28, 29, 31, 32, 33, 34, 36, 37, 38, 39, 41, 42, 43, 44, 45, 51,
       ],
     },
-    {
-      branch: "CSIT",
-      sections: [5, 10, 15, 20, 25, 30],
-    },
-    {
-      branch: "ECE",
-      sections: [35, 40, 46],
-    },
-    {
-      branch: "BCA",
-      sections: ["R1", "R2"],
-    },
-    {
-      branch: "MCA",
-      sections: ["A1", "A2", "B1", "B2", "C1"],
-    },
-    {
-      branch: "EEE",
-      sections: [49],
-    },
-    {
-      branch: "EE",
-      sections: [48],
-    },
-    {
-      branch: "CE",
-      sections: [47],
-    },
-    {
-      branch: "ME",
-      sections: [50],
-    },
+    { branch: "CSIT", sections: [5, 10, 15, 20, 25, 30] },
+    { branch: "ECE", sections: [35, 40, 46] },
+    { branch: "BCA", sections: ["R1", "R2"] },
+    { branch: "MCA", sections: ["A1", "A2", "B1", "B2", "C1"] },
+    { branch: "EEE", sections: [49] },
+    { branch: "EE", sections: [48] },
+    { branch: "CE", sections: [47] },
+    { branch: "ME", sections: [50] },
   ];
+
   const handleVisitorId = (id: string) => {
     if (!visitorId) {
       setVisitorId(id);
@@ -86,7 +66,7 @@ const RegistrationPage = () => {
     name: yup
       .string()
       .test("name-required", "Full name is required", (value) =>
-        AuthType === "REGISTER" ? !!value : true
+        authType === "REGISTER" ? !!value : true
       ),
     email: yup
       .string()
@@ -95,20 +75,19 @@ const RegistrationPage = () => {
     branch: yup
       .string()
       .test("branch-required", "Branch is required", (value) =>
-        AuthType === "REGISTER" ? !!value : true
+        authType === "REGISTER" ? !!value : true
       ),
     section: yup
       .string()
       .test("section-required", "Section is required", (value) =>
-        AuthType === "REGISTER" ? !!value : true
+        authType === "REGISTER" ? !!value : true
       ),
     registration_no: yup
       .string()
       .test("reg-no-required", "Registration number is required", (value) =>
-        AuthType === "REGISTER" ? !!value : true
+        authType === "REGISTER" ? !!value : true
       )
-      .min(10, "Registration number must be 10 digits")
-      .matches(/^\d+$/, "Only numeric values are allowed"),
+      .min(10, "Registration number must be 10 digits"),
     password: yup
       .string()
       .required("Password is required")
@@ -119,20 +98,11 @@ const RegistrationPage = () => {
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-
-    // Update branch and reset section if branch changes
-    if (name === "branch") {
-      setFormData((prevState) => ({
-        ...prevState,
-        branch: value,
-        section: "", // Reset section on branch change
-      }));
-    } else {
-      setFormData((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
-    }
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+      ...(name === "branch" ? { section: "" } : {}),
+    }));
   };
 
   const handleLogin = async () => {
@@ -140,7 +110,6 @@ const RegistrationPage = () => {
       const loginData = await pb
         .collection("users")
         .authWithPassword(formData.registration_no, formData.password);
-
       if (loginData.token) {
         setCookie("token", loginData.token, {
           maxAge: 60 * 60 * 24 * 30.44 * 7,
@@ -161,82 +130,10 @@ const RegistrationPage = () => {
       }
     } catch (error) {
       console.error("Error logging in:", error);
+      toast.error("Login failed. Please check your credentials.");
     }
   };
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     // Validate form data against the schema
-  //     if (!visitorId) {
-  //       toast.error("Visitor ID not captured yet. Please refresh the page.");
-  //       return;
-  //     }
-  //     const validityResponse = await validationSchema.validate(formData, {
-  //       abortEarly: false,
-  //     });
-  //     console.log(
-  //       AuthType === "REGISTER" ? "Registration Data:" : "Login Data:",
-  //       validityResponse
-  //     );
-  //     console.log("Visitor ID:", visitorId);
-  //     const data = {
-  //       password: formData.password,
-  //       passwordConfirm: formData.password,
-  //       email: formData.email,
-  //       name: formData.name,
-  //       registration_no: formData.registration_no,
-  //       section: formData.section,
-  //       branch: formData.branch,
-  //       visitor_id: visitorId,
-  //     };
-  //     console.log("Visitor ID:", data.visitor_id);
-
-  //     const record = await pb.collection("users").create(data);
-  //     if (record?.id) {
-  //       const authData = await pb
-  //         .collection("users")
-  //         .authWithPassword(formData.registration_no, formData.password);
-
-  //       // after the above you can also access the auth data from the authStore
-  //       console.log("AuthData", authData);
-  //       if (authData.token) {
-  //         dispatch(
-  //           updateProfile({
-  //             id: record.id,
-  //             name: record.name,
-  //             email: record.email,
-  //             registration_no: record.registration_no,
-  //             section: record.section,
-  //             branch: record.branch,
-  //             token: authData.token,
-  //           })
-  //         );
-  //       }
-  //       // console.log(pb.authStore.token);
-  //     }
-
-  //     console.log(data);
-
-  //     console.log("You are ready to go.");
-  //   } catch (error) {
-  //     if (error instanceof yup.ValidationError) {
-  //       // Optionally map errors to display in the UI
-
-  //       if (error.inner.length > 0) {
-  //         toast.error(error.inner[0].message, {
-  //           position: "top-right",
-  //           autoClose: 3000,
-  //           hideProgressBar: false,
-  //           closeOnClick: true,
-  //           pauseOnHover: true,
-  //           draggable: true,
-  //         });
-  //       }
-  //     } else {
-  //       console.error("Unexpected Error:", error);
-  //     }
-  //   }
-  // };
   const handleSubmit = async () => {
     try {
       if (!visitorId) {
@@ -244,18 +141,11 @@ const RegistrationPage = () => {
         return;
       }
 
-      const validityResponse = await validationSchema.validate(formData, {
-        abortEarly: false,
-      });
+      await validationSchema.validate(formData, { abortEarly: false });
 
       const data = {
-        password: formData.password,
+        ...formData,
         passwordConfirm: formData.password,
-        email: formData.email,
-        name: formData.name,
-        registration_no: formData.registration_no,
-        section: formData.section,
-        branch: formData.branch,
         visitor_id: visitorId,
       };
 
@@ -287,19 +177,14 @@ const RegistrationPage = () => {
       window.location.href = "/privacy";
     } catch (error: any) {
       if (error instanceof yup.ValidationError) {
-        if (error.inner.length > 0) {
-          toast.error(error.inner[0].message, {
-            position: "top-right",
-            autoClose: 3000,
-          });
-        }
+        toast.error(error.inner[0]?.message || "Validation failed");
       } else if (error.response?.data) {
         toast.error(
-          error.response.data.message || "Failed to create a record.",
-          { position: "top-right", autoClose: 3000 }
+          error.response.data.message || "Failed to create a record."
         );
       } else {
         console.error("Unexpected Error:", error);
+        toast.error("An unexpected error occurred.");
       }
     }
   };
@@ -314,252 +199,248 @@ const RegistrationPage = () => {
   const availableSections = getSectionsForBranch(formData.branch);
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col sm:bg-white bg-[url('/cover-img.jpg')] bg-cover bg-center">
-      {/* Main content */}
-      <div className="flex-grow flex items-center justify-center px-4 pt-8">
-        <div className="w-full max-w-md bg-white/80 backdrop-blur-lg p-6 rounded-lg shadow-lg">
-          <h1 className="text-3xl font-bold mb-8 text-center">Upashtiti iOS</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 p-4 sm:p-6 md:p-8 flex flex-col items-center justify-between relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full transform rotate-45 animate-pulse"></div>
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-yellow-400/20 to-red-400/20 rounded-full transform -rotate-45 animate-pulse"></div>
+      </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
-            className="space-y-6 h-[600px] overflow-y-scroll p-2"
-          >
-            {AuthType === "REGISTER" && (
-              <>
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Full Name
-                  </label>
-                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
-                    <User className="mx-2 text-gray-600" />
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Enter your full name"
-                      required
-                      className="w-full py-3 px-4 text-lg bg-transparent"
-                    />
-                  </div>
-                </div>
+      <header className="relative z-10 w-full max-w-4xl mx-auto text-center mb-10">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-4xl font-bold text-gray-800 dark:text-white mb-2"
+        >
+          Upashtiti iOS
+        </motion.h1>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex items-center justify-center gap-2 text-xl text-gray-600 dark:text-gray-300"
+        >
+          <span>Attendance Made Easy</span>
+          <Zap className="w-6 h-6 text-yellow-400" />
+        </motion.div>
+      </header>
 
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Email
-                  </label>
-                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
-                    <Mail className="mx-2 text-gray-600" />
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="Enter your email"
-                      required
-                      className="w-full py-3 px-4 text-lg bg-transparent"
-                    />
-                  </div>
-                </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden"
+      >
+        <div className="p-8">
+          <div className="mb-8 flex justify-center space-x-4">
+            <AuthTypeButton
+              type="REGISTER"
+              currentType={authType}
+              onClick={() => setAuthType("REGISTER")}
+            />
+            <AuthTypeButton
+              type="LOGIN"
+              currentType={authType}
+              onClick={() => setAuthType("LOGIN")}
+            />
+          </div>
 
-                <div>
-                  <label
-                    htmlFor="branch"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Branch
-                  </label>
-                  <select
-                    id="branch"
+          <AnimatePresence mode="wait">
+            <motion.form
+              key={authType}
+              initial={{ opacity: 0, x: authType === "REGISTER" ? 20 : -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: authType === "REGISTER" ? -20 : 20 }}
+              transition={{ duration: 0.3 }}
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}
+              className="space-y-6"
+            >
+              {authType === "REGISTER" && (
+                <>
+                  <InputField
+                    icon={User}
+                    name="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <InputField
+                    icon={Mail}
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <SelectField
+                    icon={BookOpen}
                     name="branch"
                     value={formData.branch}
                     onChange={handleInputChange}
                     required
-                    className="w-full py-3 px-4 rounded-lg border border-gray-300 bg-gray-50 text-lg appearance-none"
-                  >
-                    <option value="">Select Your Branch</option>
-                    {branches.map((branch) => (
-                      <option key={branch} value={branch}>
-                        {branch}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="section"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Section
-                  </label>
-                  <select
-                    id="section"
+                    options={branches}
+                    placeholder="Select Your Branch"
+                  />
+                  <SelectField
+                    icon={Users}
                     name="section"
                     value={formData.section}
                     onChange={handleInputChange}
                     required
-                    disabled={!formData.branch} // Disable until a branch is selected
-                    className="w-full py-3 px-4 rounded-lg border border-gray-300 bg-gray-50 text-lg appearance-none"
-                  >
-                    <option value="">
-                      {formData.branch
+                    options={availableSections}
+                    placeholder={
+                      formData.branch
                         ? "Select Your Section"
-                        : "Select a Branch First"}
-                    </option>
-                    {availableSections.map((section) => (
-                      <option key={section} value={section}>
-                        {section}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="registration_no"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Registration Number
-                  </label>
-                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
-                    <Link className="mx-2 text-gray-600" />
-                    <input
-                      type={formData.branch === "MCA" ? "text" : "number"}
-                      id="registration_no"
-                      name="registration_no"
-                      value={formData.registration_no}
-                      onChange={handleInputChange}
-                      placeholder="Enter your registration number"
-                      required
-                      className="w-full py-3 px-4 text-lg bg-transparent"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Password
-                  </label>
-                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
-                    <Lock className="mx-2 text-gray-600" />
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      placeholder="Enter your password"
-                      required
-                      className="w-full py-3 px-4 text-lg bg-transparent"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-            {AuthType === "LOGIN" && (
-              <>
-                <div>
-                  <label
-                    htmlFor="registration_no"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Registration Number
-                  </label>
-                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
-                    <User className="mx-2 text-gray-600" />
-                    <input
-                      type="number"
-                      id="registration_no"
-                      name="registration_no"
-                      value={formData.registration_no}
-                      onChange={handleInputChange}
-                      placeholder="Enter your Registration Number"
-                      required
-                      className="w-full py-3 px-4 text-lg bg-transparent"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-lg font-semibold mb-2 text-gray-800"
-                  >
-                    Password
-                  </label>
-                  <div className="flex items-center border rounded-lg border-gray-300 bg-gray-50">
-                    <Lock className="mx-2 text-gray-600" />
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      placeholder="Enter your password"
-                      required
-                      className="w-full py-3 px-4 text-lg bg-transparent"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-            {AuthType === "REGISTER" && (
-              <div>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  className="w-full py-3 px-6 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
-                >
-                  Register
-                </button>
-              </div>
-            )}
-            {AuthType === "LOGIN" && (
-              <div>
-                <button
-                  type="button"
-                  onClick={handleLogin}
-                  className="w-full py-3 px-6 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
-                >
-                  Login
-                </button>
-              </div>
-            )}
-          </form>
-
-          <div className="text-center mt-4">
-            <p>
-              {AuthType === "REGISTER"
-                ? "Already have an account?"
-                : "Don’t have an account?"}
-              <button
-                onClick={() =>
-                  setAuthType(AuthType === "REGISTER" ? "LOGIN" : "REGISTER")
-                }
-                className="text-blue-500 underline ml-2"
+                        : "Select a Branch First"
+                    }
+                    disabled={!formData.branch}
+                  />
+                  <InputField
+                    icon={Hash}
+                    name="registration_no"
+                    type={formData.branch === "MCA" ? "text" : "number"}
+                    placeholder="Enter your registration number"
+                    value={formData.registration_no}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </>
+              )}
+              {authType === "LOGIN" && (
+                <InputField
+                  icon={Hash}
+                  name="registration_no"
+                  type="text"
+                  placeholder="Enter your Registration Number"
+                  value={formData.registration_no}
+                  onChange={handleInputChange}
+                  required
+                />
+              )}
+              <InputField
+                icon={Lock}
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+              />
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={authType === "REGISTER" ? handleSubmit : handleLogin}
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out"
               >
-                {AuthType === "REGISTER" ? "Login" : "Register"}
-              </button>
-            </p>
-          </div>
+                {authType === "REGISTER" ? "Register" : "Login"}
+              </motion.button>
+            </motion.form>
+          </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
+
       <DeviceFingerprint onVisitorIdCaptured={handleVisitorId} />
-      <p className="text-black">Visitor ID : {visitorId}</p>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="mt-8 text-sm text-center text-gray-500 dark:text-gray-400"
+      >
+        Visitor ID: {visitorId}
+      </motion.p>
     </div>
   );
 };
 
+interface InputFieldProps {
+  icon: React.ElementType;
+  name: string;
+  type: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+}
+
+const InputField: React.FC<InputFieldProps> = ({ icon: Icon, ...props }) => (
+  <div className="relative">
+    <Icon
+      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+      size={18}
+    />
+    <input
+      {...props}
+      className="w-full pl-10 pr-3 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-800 dark:text-white transition duration-200"
+    />
+  </div>
+);
+
+interface SelectFieldProps {
+  icon: React.ElementType;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  required?: boolean;
+  options: (string | number)[];
+  placeholder: string;
+  disabled?: boolean;
+}
+
+const SelectField: React.FC<SelectFieldProps> = ({
+  icon: Icon,
+  options,
+  placeholder,
+  ...props
+}) => (
+  <div className="relative">
+    <Icon
+      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+      size={18}
+    />
+    <select
+      {...props}
+      className="w-full pl-10 pr-3 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-800 dark:text-white appearance-none transition duration-200"
+    >
+      <option value="">{placeholder}</option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
+interface AuthTypeButtonProps {
+  type: "REGISTER" | "LOGIN";
+  currentType: "REGISTER" | "LOGIN";
+  onClick: () => void;
+}
+
+const AuthTypeButton: React.FC<AuthTypeButtonProps> = ({
+  type,
+  currentType,
+  onClick,
+}) => (
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={onClick}
+    className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
+      currentType === type
+        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+        : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+    }`}
+  >
+    {type === "REGISTER" ? "Register" : "Login"}
+  </motion.button>
+);
+
 export default RegistrationPage;
+

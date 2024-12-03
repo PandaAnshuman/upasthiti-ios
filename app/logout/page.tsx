@@ -14,7 +14,7 @@ const page = () => {
     pb.authStore.clear();
     deleteCookie("token");
     dispatch(resetProfile());
-    window.location.href = "/register";
+    window.location.href = "/auth";
   }, []);
   return <div></div>;
 };
