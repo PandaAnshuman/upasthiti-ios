@@ -2,7 +2,8 @@
 import React from "react";
 import { AppDispatch, useAppSelector } from "@/redux/store";
 import { useDispatch } from "react-redux";
-import { Info, Shield, LogOut } from "lucide-react";
+import { Info, Shield, LogOut, UserCog } from "lucide-react";
+import { motion } from "framer-motion";
 
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,8 +20,17 @@ const page = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full transform rotate-45 animate-pulse"></div>
         <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-yellow-400/20 to-red-400/20 rounded-full transform -rotate-45 animate-pulse"></div>
-        <div className=" p-4">
-          <h1 className="text-center text-2xl font-bold">Upasthiti-iOS</h1>
+
+        <div className="mt-5">
+          <header className="flex justify-center items-center  mb-8">
+            <motion.div
+              className="flex items-center gap-2 bg-white/10 rounded-full px-6 py-3 text-xl"
+              whileHover={{ scale: 1.05 }}
+            >
+              <span>Profile</span>
+              <UserCog className="w-6 h-6 text-yellow-400" />
+            </motion.div>
+          </header>
         </div>
       </div>
 
