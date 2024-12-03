@@ -90,7 +90,8 @@ const Home: NextPage = () => {
           })
         );
       } else {
-        setAttendanceMessage("Failed to mark attendance. Try again.");
+        // setAttendanceMessage(`${Failed to mark attendance. Try again.{responseData.message}}`);
+        setAttendanceMessage(responseData.message);
       }
     } catch (error) {
       console.error("Error marking attendance:", error);
