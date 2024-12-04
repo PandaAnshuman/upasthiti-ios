@@ -43,7 +43,10 @@ const Home: NextPage = () => {
   const todaysDate = new Date().toISOString().split("T")[0];
   // console.log(todaysDate);
   const handleVisitorId = (id: string) => {
-    setVisitorId(id);
+    if (!visitorId) {
+      setVisitorId(id);
+      console.log("Captured Visitor ID:", id);
+    }
   };
   const [currentTime, setCurrentTime] = useState(new Date());
 
