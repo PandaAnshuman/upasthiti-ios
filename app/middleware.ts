@@ -17,15 +17,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-
-
-  // Check if the User-Agent contains "iPhone"
   if (!/iPhone/i.test(userAgent)) {
     return NextResponse.redirect(new URL('/not-allowed', request.url));
   }
 
-  // Check if the user is authenticated (token exists)
-  // If no token and not on the '/auth' page, redirect to '/auth'
   if (!token && url.pathname !== '/auth') {
     return NextResponse.redirect(new URL('/auth', request.url));
   }

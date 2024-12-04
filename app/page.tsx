@@ -68,6 +68,7 @@ const Home: NextPage = () => {
       };
       let bodyContent = JSON.stringify({
         jwt: scannedData,
+        vid: visitorId,
       });
 
       const response = await fetch(
@@ -90,7 +91,6 @@ const Home: NextPage = () => {
           })
         );
       } else {
-        // setAttendanceMessage(`${Failed to mark attendance. Try again.{responseData.message}}`);
         setAttendanceMessage(responseData.message);
       }
     } catch (error) {
@@ -106,6 +106,7 @@ const Home: NextPage = () => {
   // console.log("today's date", todaysDate);
   // console.log(lastAttended);
   // console.log(isEligible);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 p-6 flex flex-col items-center justify-between relative overflow-hidden">
       {/* Animated background */}

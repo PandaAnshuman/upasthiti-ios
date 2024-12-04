@@ -156,22 +156,23 @@ const RegistrationPage = () => {
           .collection("users")
           .authWithPassword(formData.registration_no, formData.password);
 
-        if (authData.token) {
-          dispatch(
-            updateProfile({
-              id: record.id,
-              name: record.name,
-              email: record.email,
-              registration_no: record.registration_no,
-              section: record.section,
-              branch: record.branch,
-              token: authData.token,
-            })
-          );
-          setCookie("token", authData.token, {
-            maxAge: 60 * 60 * 24 * 30.44 * 7,
-          });
-        }
+          if (authData.token) {
+            dispatch(
+              updateProfile({
+                id: record.id,
+                name: record.name,
+                email: record.email,
+                registration_no: record.registration_no,
+                section: record.section,
+                branch: record.branch,
+                token: authData.token,
+              })
+            );
+
+            setCookie("token", authData.token, {
+              maxAge: 60 * 60 * 24 * 30.44 * 7,
+            });
+          }
       }
 
       toast.success("You are ready to go.");
