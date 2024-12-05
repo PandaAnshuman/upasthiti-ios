@@ -105,35 +105,35 @@ const RegistrationPage = () => {
     }));
   };
 
-  const handleLogin = async () => {
-    try {
-      const loginData = await pb
-        .collection("users")
-        .authWithPassword(formData.registration_no, formData.password);
-      if (loginData.token) {
-        setCookie("token", loginData.token, {
-          maxAge: 60 * 60 * 24 * 30.44 * 7,
-        });
-        console.log("Logged in successfully:", loginData.token);
-        dispatch(
-          updateProfile({
-            id: loginData.record.id,
-            name: loginData.record.name,
-            email: loginData.record.email,
-            registration_no: loginData.record.registration_no,
-            section: loginData.record.section,
-            branch: loginData.record.branch,
-            token: loginData.token,
-          })
-        );
-        toast.success("Logged in successfully.");
-        window.location.href = "/";
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
-      toast.error("Login failed. Please check your credentials.");
-    }
-  };
+  // const handleLogin = async () => {
+  //   try {
+  //     const loginData = await pb
+  //       .collection("users")
+  //       .authWithPassword(formData.registration_no, formData.password);
+  //     if (loginData.token) {
+  //       setCookie("token", loginData.token, {
+  //         maxAge: 60 * 60 * 24 * 30.44 * 7,
+  //       });
+  //       console.log("Logged in successfully:", loginData.token);
+  //       dispatch(
+  //         updateProfile({
+  //           id: loginData.record.id,
+  //           name: loginData.record.name,
+  //           email: loginData.record.email,
+  //           registration_no: loginData.record.registration_no,
+  //           section: loginData.record.section,
+  //           branch: loginData.record.branch,
+  //           token: loginData.token,
+  //         })
+  //       );
+  //       toast.success("Logged in successfully.");
+  //       window.location.href = "/";
+  //     }
+  //   } catch (error) {
+  //     console.error("Error logging in:", error);
+  //     toast.error("Login failed. Please check your credentials.");
+  //   }
+  // };
 
   const handleSubmit = async () => {
     try {
@@ -156,23 +156,23 @@ const RegistrationPage = () => {
           .collection("users")
           .authWithPassword(formData.registration_no, formData.password);
 
-          if (authData.token) {
-            dispatch(
-              updateProfile({
-                id: record.id,
-                name: record.name,
-                email: record.email,
-                registration_no: record.registration_no,
-                section: record.section,
-                branch: record.branch,
-                token: authData.token,
-              })
-            );
+        if (authData.token) {
+          dispatch(
+            updateProfile({
+              id: record.id,
+              name: record.name,
+              email: record.email,
+              registration_no: record.registration_no,
+              section: record.section,
+              branch: record.branch,
+              token: authData.token,
+            })
+          );
 
-            setCookie("token", authData.token, {
-              maxAge: 60 * 60 * 24 * 30.44 * 7,
-            });
-          }
+          setCookie("token", authData.token, {
+            maxAge: 60 * 60 * 24 * 30.44 * 7,
+          });
+        }
       }
 
       toast.success("You are ready to go.");
@@ -196,6 +196,62 @@ const RegistrationPage = () => {
       (detail) => detail.branch === branch
     );
     return branchDetail ? branchDetail.sections : [];
+  };
+
+  const handlelogin = async () => {
+    try {
+      let headersList = {
+        Accept: "*/*",
+        "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+        "Content-Type": "application/json",
+      };
+
+      let bodyContent = JSON.stringify({
+        identity: formData.registration_no,
+        password: formData.password,
+        vid: vid,
+      });
+
+      const respone = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/collections/users/auth-with-password`,
+        {
+          method: "POST",
+          body: bodyContent,
+          headers: headersList,
+        }
+      );
+
+      let responseData = await respone.text();
+      const data = JSON.parse(responseData);
+      if (respone.status === 200) {
+        const token = data.token;
+        if (token) {
+          setCookie("token", token, {
+            maxAge: 60 * 60 * 24 * 30.44 * 7,
+          });
+          console.log("Logged in successfully:", token);
+          dispatch(
+            updateProfile({
+              id: data.record.id,
+              name: data.record.name,
+              email: data.record.email,
+              registration_no: data.record.registration_no,
+              section: data.record.section,
+              branch: data.record.branch,
+              token: token,
+            })
+          );
+          toast.success("Logged in successfully.");
+          window.location.href = "/";
+        }
+        console.log(data);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Login failed. Please check your credentials and try again.");
+    }
   };
 
   const availableSections = getSectionsForBranch(formData.branch);
@@ -337,7 +393,7 @@ const RegistrationPage = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="button"
-                onClick={authType === "REGISTER" ? handleSubmit : handleLogin}
+                onClick={authType === "REGISTER" ? handleSubmit : handlelogin}
                 className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out"
               >
                 {authType === "REGISTER" ? "Register" : "Login"}
