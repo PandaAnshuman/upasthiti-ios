@@ -10,7 +10,7 @@ const page = () => {
         </h1>
         <p className="text-lg mb-6">
           Sorry, this website is only accessible on{" "}
-          <span className="text-blue-400 font-semibold">iPhone</span> devices.
+          <span className="text-blue-400 font-semibold">Mobile</span> devices.
         </p>
         <p className="text-sm text-gray-400">
           Please try accessing this site using a supported device.
