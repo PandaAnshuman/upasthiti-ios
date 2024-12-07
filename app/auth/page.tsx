@@ -11,8 +11,10 @@ import pb from "@/utils/pocketbase";
 import DeviceFingerprint from "../components/DeviceFingerprint";
 import { updateProfile } from "@/redux/features/profile-slice";
 import { AppDispatch } from "@/redux/store";
+import { useRouter } from "next/navigation";
 
 const RegistrationPage = () => {
+  const router = useRouter();
   const [authType, setAuthType] = useState<"REGISTER" | "LOGIN">("REGISTER");
   const [formData, setFormData] = useState({
     name: "",
@@ -138,7 +140,7 @@ const RegistrationPage = () => {
   const handleSubmit = async () => {
     try {
       if (!vid) {
-        toast.error("Visitor ID not captured yet. Please refresh the page.");
+        toast.error("Please refresh the page and try again.");
         return;
       }
 
@@ -152,31 +154,8 @@ const RegistrationPage = () => {
 
       const record = await pb.collection("users").create(data);
       if (record?.id) {
-        const authData = await pb
-          .collection("users")
-          .authWithPassword(formData.registration_no, formData.password);
-
-        if (authData.token) {
-          dispatch(
-            updateProfile({
-              id: record.id,
-              name: record.name,
-              email: record.email,
-              registration_no: record.registration_no,
-              section: record.section,
-              branch: record.branch,
-              token: authData.token,
-            })
-          );
-
-          setCookie("token", authData.token, {
-            maxAge: 60 * 60 * 24 * 30.44 * 7,
-          });
-        }
+        handlelogin();
       }
-
-      toast.success("You are ready to go.");
-      window.location.href = "/privacy";
     } catch (error: any) {
       if (error instanceof yup.ValidationError) {
         toast.error(error.inner[0]?.message || "Validation failed");
@@ -198,11 +177,12 @@ const RegistrationPage = () => {
     return branchDetail ? branchDetail.sections : [];
   };
 
+  // const loginAfterRegistration = async () => {
+
   const handlelogin = async () => {
     try {
       let headersList = {
         Accept: "*/*",
-        "User-Agent": "Thunder Client (https://www.thunderclient.com)",
         "Content-Type": "application/json",
       };
 
@@ -229,7 +209,7 @@ const RegistrationPage = () => {
           setCookie("token", token, {
             maxAge: 60 * 60 * 24 * 30.44 * 7,
           });
-          console.log("Logged in successfully:", token);
+
           dispatch(
             updateProfile({
               id: data.record.id,
@@ -241,8 +221,13 @@ const RegistrationPage = () => {
               token: token,
             })
           );
-          toast.success("Logged in successfully.");
-          window.location.href = "/";
+          if (authType === "LOGIN") {
+            toast.success("Logged in successfully.");
+            router.replace("/");
+          } else {
+            toast.success("You are  ready to go !!.");
+            router.push("/privacy");
+          }
         }
         console.log(data);
       } else {
@@ -404,14 +389,6 @@ const RegistrationPage = () => {
       </motion.div>
 
       <DeviceFingerprint onVisitorIdCaptured={handleVisitorId} />
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="mt-8 text-sm text-center text-gray-500 dark:text-gray-400"
-      >
-        Visitor ID: {vid}
-      </motion.p>
     </div>
   );
 };

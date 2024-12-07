@@ -29,6 +29,7 @@ import { getCookie } from "cookies-next";
 import { useDispatch } from "react-redux";
 import { updateProfile } from "@/redux/features/profile-slice";
 import "./globals.css";
+// import Loader from "./components/loader/page";
 
 const Home: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -132,7 +133,7 @@ const Home: NextPage = () => {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-white text-xl font-semibold m-0">Hi,</h3>
-                <h2 className="text-white text-3xl font-bold flex items-center gap-2 m-0">
+                <h2 className="text-white text-2xl font-bold flex items-center gap-2 m-0">
                   {name.split(" ")[0].toUpperCase()}
                   <span className="wave inline-block">👋</span>
                 </h2>
@@ -160,6 +161,7 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
+        {/* <Loader /> */}
         {isEligible ? (
           <>
             {/* Scan QR and Show QR Buttons */}
