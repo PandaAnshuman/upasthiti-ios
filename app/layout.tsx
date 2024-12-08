@@ -38,6 +38,7 @@ export default function RootLayout({
       <body className="antialiased">
         <RootClient />
         <ReduxProvider>{children}</ReduxProvider>
+
         <ToastContainer />
       </body>
     </html>

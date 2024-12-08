@@ -295,7 +295,7 @@ const Home: NextPage = () => {
           </>
         )}
       </div>
-      <div className="bg-white dark:bg-gray-500 rounded-xl shadow-lg w-full max-w-md p-6 ">
+      {/* <div className="bg-white dark:bg-gray-500 rounded-xl shadow-lg w-full max-w-md p-6 ">
         <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
           Quick Links
         </h3>
@@ -313,7 +313,7 @@ const Home: NextPage = () => {
             )
           )}
         </ul>
-      </div>
+      </div> */}
 
       {/* About Button */}
       <div className="fixed bottom-4 right-4 z-50">

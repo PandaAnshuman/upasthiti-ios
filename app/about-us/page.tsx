@@ -21,7 +21,7 @@ const page = () => {
           name: "PAWAN KUMAR",
           role: "Ex-FTC Intern@Fidelity International | Flutter App Developer | Solving for India Regional Qualified | HackOn with Amazon'22",
           photo: "/placeholder.svg?height=300&width=300&text=PK",
-          link: "https://www.linkedin.com/in/pawan-kumar-0b0b1b1b1/",
+          link: "https://www.linkedin.com/in/pawan-k-9490581b5/",
         },
       ],
     },
@@ -118,6 +118,7 @@ const page = () => {
                       </p>
 
                       <motion.a
+                        target="_blank"
                         href={profile.link}
                         className="text-purple-600 font-medium text-sm hover:text-purple-800 transition-colors"
                         whileHover={{ scale: 1.05 }}

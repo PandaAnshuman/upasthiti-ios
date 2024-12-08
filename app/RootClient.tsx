@@ -10,28 +10,29 @@ export default function RootClient() {
     });
 
     // Block F12 key
-    const handleKeyPress = (event: any) => {
-      // if (event.key === "F12") {
-      //   event.preventDefault();
-      //   alert("F12 is disabled!");
-      // }
+    const blockKeyCombinations = (event: KeyboardEvent) => {
       if (
-        (event.ctrlKey || event.metaKey) && // For Mac (Cmd)
-        event.shiftKey &&
-        event.key === "I"
+        // event.key === "F12" || // Block F12
+        ((event.ctrlKey || event.metaKey) && event.key === "U") || // Block Ctrl+U
+        ((event.ctrlKey || event.metaKey) &&
+          event.shiftKey &&
+          event.key === "I") || // Block Ctrl+Shift+I
+        ((event.ctrlKey || event.metaKey) &&
+          event.shiftKey &&
+          event.key === "J") || // Block Ctrl+Shift+J
+        ((event.ctrlKey || event.metaKey) &&
+          event.shiftKey &&
+          event.key === "C") ||
+        ((event.ctrlKey || event.metaKey) &&
+          event.shiftKey &&
+          event.key === "c") ||
+        ((event.ctrlKey || event.metaKey) && event.key === "S") // Block Ctrl+S
       ) {
         event.preventDefault();
-        alert("Inspect is disabled!");
-      }
-
-      // Block Ctrl+U (View Page Source)
-      if (event.ctrlKey && event.key === "U") {
-        event.preventDefault();
-        alert("Viewing page source is disabled!");
+        alert("This action is disabled!");
       }
     };
-
-    window.addEventListener("keydown", handleKeyPress);
+    window.addEventListener("keydown", blockKeyCombinations);
 
     // Check if DevTools is open
     // const checkDevTools = () => {
@@ -51,7 +52,7 @@ export default function RootClient() {
 
     // Cleanup function
     return () => {
-      window.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("keydown", blockKeyCombinations);
       // clearInterval(intervalId); // Use the stored intervalId to clear the interval
       document.body.style.userSelect = "auto";
     };
