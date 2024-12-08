@@ -26,6 +26,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth', request.url));
   }
 
+  // Prevent logged-in users from accessing '/auth'
+  if (token && url.pathname === '/auth') {
+    return NextResponse.redirect(new URL('/', request.url)); // Redirect to home or dashboard
+  }
+
   // Allow the user to proceed
   return NextResponse.next();
 }

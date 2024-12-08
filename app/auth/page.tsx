@@ -207,7 +207,7 @@ const RegistrationPage = () => {
           );
           if (authType === "LOGIN") {
             toast.success("Logged in successfully.");
-            router.replace("/");
+            router.push("/");
           } else {
             toast.success("You are ready to go!");
             router.push("/privacy");
@@ -268,20 +268,38 @@ const RegistrationPage = () => {
           className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden"
         >
           <div className="p-8">
-            <div className="mb-8 flex justify-center space-x-4">
-              <AuthTypeButton
-                type="REGISTER"
-                currentType={authType}
-                onClick={() => setAuthType("REGISTER")}
-                loading={loading && authType === "REGISTER"}
-              />
-              <AuthTypeButton
-                type="LOGIN"
-                currentType={authType}
-                onClick={() => setAuthType("LOGIN")}
-                loading={loading && authType === "LOGIN"}
-              />
-            </div>
+          <div className="mb-8 flex justify-center space-x-4">
+  <button
+    onClick={() => setAuthType("REGISTER")}
+    disabled={loading}
+    className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
+      authType === "REGISTER"
+        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+        : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+    } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+  >
+    {loading && authType === "REGISTER" ? (
+      <Loader2 className="animate-spin w-5 h-5 mx-auto" />
+    ) : (
+      "Register"
+    )}
+  </button>
+  <button
+    onClick={() => setAuthType("LOGIN")}
+    disabled={loading}
+    className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
+      authType === "LOGIN"
+        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+        : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+    } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+  >
+    {loading && authType === "LOGIN" ? (
+      <Loader2 className="animate-spin w-5 h-5 mx-auto" />
+    ) : (
+      "Login"
+    )}
+  </button>
+</div>
 
             <AnimatePresence mode="wait">
               <motion.form
@@ -379,15 +397,22 @@ const RegistrationPage = () => {
                   togglePasswordVisibility={togglePasswordVisibility}
                   showPassword={showPassword}
                 />
-                <motion.button
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  type="button"
-                  onClick={authType === "REGISTER" ? handleSubmit : handlelogin}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out"
-                >
-                  {authType === "REGISTER" ? "Register" : "Login"}
-                </motion.button>
+                <button
+  type="button"
+  onClick={authType === "REGISTER" ? handleSubmit : handlelogin}
+  disabled={loading}
+  className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out ${
+    loading ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+>
+  {loading ? (
+    <Loader2 className="animate-spin w-5 h-5 mx-auto" />
+  ) : authType === "REGISTER" ? (
+    "Register"
+  ) : (
+    "Login"
+  )}
+</button>
               </motion.form>
             </AnimatePresence>
           </div>
@@ -474,42 +499,42 @@ const SelectField: React.FC<SelectFieldProps> = ({
   </div>
 );
 
-interface AuthTypeButtonProps {
-  type: "REGISTER" | "LOGIN";
-  currentType: "REGISTER" | "LOGIN";
-  onClick: () => void;
-  loading: boolean;
-}
+// interface AuthTypeButtonProps {
+//   type: "REGISTER" | "LOGIN";
+//   currentType: "REGISTER" | "LOGIN";
+//   onClick: () => void;
+//   loading: boolean;
+// }
 
-const AuthTypeButton: React.FC<AuthTypeButtonProps> = ({
-  type,
-  currentType,
-  onClick,
-  loading,
-}) => {
-  const shouldReduceMotion = useReducedMotion();
-  return (
-    <motion.button
-      whileHover={shouldReduceMotion || loading ? {} : { scale: 1.05 }}
-      whileTap={shouldReduceMotion || loading ? {} : { scale: 0.95 }}
-      onClick={loading ? undefined : onClick} // Disable click if loading
-      className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
-        currentType === type
-          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
-          : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-      }`}
-      disabled={loading} // Prevent click during loading
-    >
-      {loading && currentType === type ? (
-        <Loader2 className="animate-spin w-5 h-5 mx-auto" />
-      ) : type === "REGISTER" ? (
-        "Register"
-      ) : (
-        "Login"
-      )}
-    </motion.button>
-  );
-};
+// const AuthTypeButton: React.FC<AuthTypeButtonProps> = ({
+//   type,
+//   currentType,
+//   onClick,
+//   loading,
+// }) => {
+//   const shouldReduceMotion = useReducedMotion();
+//   return (
+//     <motion.button
+//       whileHover={shouldReduceMotion || loading ? {} : { scale: 1.05 }}
+//       whileTap={shouldReduceMotion || loading ? {} : { scale: 0.95 }}
+//       onClick={loading ? undefined : onClick} // Disable click if loading
+//       className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
+//         currentType === type
+//           ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+//           : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+//       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`} // Add styles for disabled state
+//       disabled={loading} // Disable button when loading
+//     >
+//       {loading && currentType === type ? (
+//         <Loader2 className="animate-spin w-5 h-5 mx-auto" />
+//       ) : type === "REGISTER" ? (
+//         "Register"
+//       ) : (
+//         "Login"
+//       )}
+//     </motion.button>
+//   );
+// };
 
 
 export default RegistrationPage;

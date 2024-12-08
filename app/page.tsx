@@ -124,7 +124,7 @@ const Home: NextPage = () => {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-105">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4">
             <h1 className=" flex gap-x-2 text-white text-lg font-semibold mb-1">
-              Upasthiti-iOS{" "}
+              Upasthiti{" "}
               <span>
                 <Zap className="w-6 h-6 text-yellow-400" />
               </span>
@@ -152,7 +152,7 @@ const Home: NextPage = () => {
             <div className="flex justify-between items-center">
               <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center">
                 <Clock className="w-4 h-4 mr-1" />
-                {currentTime.toLocaleTimeString()}
+                {currentTime.toLocaleTimeString("en-US", { hour12: true })}
               </p>
               <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
