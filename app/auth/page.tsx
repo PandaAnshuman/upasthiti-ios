@@ -248,7 +248,7 @@ const RegistrationPage = () => {
             transition={{ duration: 0.3 }}
             className="text-4xl font-bold text-gray-800 dark:text-white mb-2"
           >
-            Upashtiti iOS
+            Upasthiti
           </motion.h1>
           <motion.div
             initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.9 }}
