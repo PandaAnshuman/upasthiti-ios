@@ -18,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Upasthiti-iOS",
+  title: "Upasthiti",
   description: "Created By Dev Verse",
   icons: {
     icon: "/favicon.ico",
