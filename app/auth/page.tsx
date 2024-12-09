@@ -108,7 +108,7 @@ const RegistrationPage = () => {
       .test("reg-no-required", "Registration number is required", (value) =>
         authType === "REGISTER" ? !!value : true
       )
-      .min(10, "Registration number must be 10 digits"),
+      .min(5, "Registration number must be of 5 characters."),
     password: yup
       .string()
       .required("Password is required")
