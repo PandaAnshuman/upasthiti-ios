@@ -31,13 +31,13 @@ const page = () => {
         {
           name: "ANSHUMAN PANDA",
           role: "Full stack Developer | Machine Learning Engineer | Upcoming SWE Intern @JP Morgan Chase & Co.",
-          photo: "/images/anshu.jpeg",
+          photo: "/images/anshu.png",
           link: "https://www.linkedin.com/in/anshuman-panda-575562258/",
         },
         {
           name: "SUBHRANSHU CHOUDHURY",
           role: "MERN | Ethical Hacker & Cyber Expert | Native and Web3 Developer | YouTuber | Fullstack Developer @Timepay.ai",
-          photo: "/images/subhransu.jpeg",
+          photo: "/images/shub.png",
           link: "https://www.linkedin.com/in/subhranshusekharchoudhury/",
         },
         {
@@ -49,7 +49,7 @@ const page = () => {
         {
           name: "SOHAIL KHAN",
           role: "MERN | Ethical Hacker & Bug Bounty Hunter",
-          photo: "/images/sohail.jpeg",
+          photo: "/images/sohail.png",
           link: "https://www.linkedin.com/in/sohail-khan-coder/",
         },
       ],

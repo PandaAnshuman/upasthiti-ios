@@ -240,10 +240,10 @@ const RegistrationPage = () => {
           );
           if (authType === "LOGIN") {
             toast.success("Logged in successfully.");
-            router.push("/");
+            router.replace("/");
           } else {
             toast.success("You are ready to go!");
-            router.push("/privacy");
+            router.replace("/privacy");
           }
         }
         // console.log(data);

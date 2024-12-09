@@ -28,6 +28,7 @@ import { getCookie } from "cookies-next";
 import { useDispatch } from "react-redux";
 import { updateProfile } from "@/redux/features/profile-slice";
 import "./globals.css";
+import Link from "next/link";
 // import Loader from "./components/loader/page";
 
 const Home: NextPage = () => {
@@ -334,16 +335,15 @@ const Home: NextPage = () => {
 
       {/* About Button */}
       <div className="fixed bottom-4 right-4 z-50">
-        <a
+        <Link
           href="/about-us"
           className="group flex flex-col items-center justify-center p-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg hover:from-yellow-500 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 w-20 h-20 transition-all duration-300 transform hover:scale-110"
-          aria-label="About Upasthiti-iOS"
         >
           <Info size={28} className="text-white group-hover:animate-pulse" />
           <span className="text-xs text-white font-semibold mt-1 opacity-100 group-hover:font-bold">
             About
           </span>
-        </a>
+        </Link>
       </div>
 
       {/* TeamProfile Modal */}
