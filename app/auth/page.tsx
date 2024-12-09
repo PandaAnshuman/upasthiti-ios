@@ -122,7 +122,7 @@ const RegistrationPage = () => {
       .test("reg-no-required", "Registration number is required", (value) =>
         authType === "REGISTER" ? !!value : true
       )
-      .min(10, "Registration number must be of 5 characters."),
+      .min(10, "Registration number must be 10 digits"),
     password: yup
       .string()
       .required("Password is required")
@@ -569,6 +569,4 @@ const SelectField: React.FC<SelectFieldProps> = ({
 //   );
 // };
 
-
 export default RegistrationPage;
-
