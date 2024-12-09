@@ -19,10 +19,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import pb from "@/utils/pocketbase";
-import DeviceFingerprint from "../components/DeviceFingerprint";
 import { updateProfile } from "@/redux/features/profile-slice";
 import { AppDispatch } from "@/redux/store";
 import { useRouter } from "next/navigation";
+import CryptoJS from "crypto-js";
 
 const RegistrationPage = () => {
   const router = useRouter();
@@ -38,13 +38,34 @@ const RegistrationPage = () => {
     email: "",
     registration_no: "",
   });
-  const [vid, setvid] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
+  const todaysDate = new Date().toLocaleDateString();
+  // console.log(todaysDate);
+
+  function encryptData(data: any) {
+    const encrypted = CryptoJS.AES.encrypt(
+      JSON.stringify(data),
+      "i0pERnlYwn"
+    ).toString();
+    return encrypted;
+  }
+
+  function decryptData(encryptedData: string) {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, "i0pERnlYwn");
+    const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decrypted;
+  }
+
+  function getExpiryDateForMonths(months: number) {
+    const date = new Date();
+    date.setMonth(date.getMonth() + months);
+    return date;
+  }
 
   const branches = [
     "CSE",
@@ -76,13 +97,6 @@ const RegistrationPage = () => {
     { branch: "ME", sections: [50] },
   ];
 
-  const handleVisitorId = (id: string) => {
-    if (!vid) {
-      setvid(id);
-      console.log("Captured Visitor ID:", id);
-    }
-  };
-
   const validationSchema = yup.object({
     name: yup
       .string()
@@ -108,11 +122,11 @@ const RegistrationPage = () => {
       .test("reg-no-required", "Registration number is required", (value) =>
         authType === "REGISTER" ? !!value : true
       )
-      .min(10, "Registration number must be 10 digits"),
+      .min(10, "Registration number must be of 5 characters."),
     password: yup
       .string()
       .required("Password is required")
-      .min(8, "Password must be at least 8 characters"),
+      .min(5, "Password must be at least 8 characters"),
   });
 
   const handleInputChange = (
@@ -129,12 +143,20 @@ const RegistrationPage = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      if (!vid) {
-        toast.error("Please refresh the page and try again.");
+      await validationSchema.validate(formData, { abortEarly: false });
+
+      const localSavedVID = localStorage.getItem("visitor_id");
+
+      if (localSavedVID) {
+        toast.error(
+          `The device is already registered with ${
+            decryptData(localSavedVID)?.split("-")[0]
+          }`
+        );
         return;
       }
 
-      await validationSchema.validate(formData, { abortEarly: false });
+      const vid = encryptData(`${formData.registration_no}-${formData.email}`);
 
       const data = {
         ...formData,
@@ -144,7 +166,8 @@ const RegistrationPage = () => {
 
       const record = await pb.collection("users").create(data);
       if (record?.id) {
-        handlelogin();
+        localStorage.setItem("visitor_id", vid);
+        handlelogin(vid);
       }
     } catch (error: any) {
       if (error instanceof yup.ValidationError) {
@@ -154,7 +177,7 @@ const RegistrationPage = () => {
           error.response.data.message || "Failed to create a record."
         );
       } else {
-        console.error("Unexpected Error:", error);
+        // console.error("Unexpected Error:", error);
         toast.error("An unexpected error occurred.");
       }
     } finally {
@@ -162,7 +185,14 @@ const RegistrationPage = () => {
     }
   };
 
-  const handlelogin = async () => {
+  const handlelogin = async (vid?: string) => {
+    let localSavedVID = localStorage.getItem("visitor_id");
+
+    if (!vid && !localSavedVID) {
+      toast.error("This device is not recongnized");
+      return;
+    }
+
     setLoading(true);
     try {
       let headersList = {
@@ -173,11 +203,11 @@ const RegistrationPage = () => {
       let bodyContent = JSON.stringify({
         identity: formData.registration_no,
         password: formData.password,
-        vid: vid,
+        vid: vid || localSavedVID,
       });
 
       const respone = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/collections/users/auth-with-password`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/collections/users/auth-with-password/new`,
         {
           method: "POST",
           body: bodyContent,
@@ -185,13 +215,12 @@ const RegistrationPage = () => {
         }
       );
 
-      let responseData = await respone.text();
-      const data = JSON.parse(responseData);
+      const data = await respone.json();
       if (respone.status === 200) {
         const token = data.token;
         if (token) {
           setCookie("token", token, {
-            maxAge: 60 * 60 * 24 * 30.44 * 7,
+            expires: getExpiryDateForMonths(5),
           });
 
           dispatch(
@@ -213,12 +242,12 @@ const RegistrationPage = () => {
             router.push("/privacy");
           }
         }
-        console.log(data);
+        // console.log(data);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       toast.error("Login failed. Please check your credentials and try again.");
     } finally {
       setLoading(false);
@@ -268,38 +297,38 @@ const RegistrationPage = () => {
           className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden"
         >
           <div className="p-8">
-          <div className="mb-8 flex justify-center space-x-4">
-  <button
-    onClick={() => setAuthType("REGISTER")}
-    disabled={loading}
-    className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
-      authType === "REGISTER"
-        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
-        : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-    } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-  >
-    {loading && authType === "REGISTER" ? (
-      <Loader2 className="animate-spin w-5 h-5 mx-auto" />
-    ) : (
-      "Register"
-    )}
-  </button>
-  <button
-    onClick={() => setAuthType("LOGIN")}
-    disabled={loading}
-    className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
-      authType === "LOGIN"
-        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
-        : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-    } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-  >
-    {loading && authType === "LOGIN" ? (
-      <Loader2 className="animate-spin w-5 h-5 mx-auto" />
-    ) : (
-      "Login"
-    )}
-  </button>
-</div>
+            <div className="mb-8 flex justify-center space-x-4">
+              <button
+                onClick={() => setAuthType("REGISTER")}
+                disabled={loading}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
+                  authType === "REGISTER"
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {loading && authType === "REGISTER" ? (
+                  <Loader2 className="animate-spin w-5 h-5 mx-auto" />
+                ) : (
+                  "Register"
+                )}
+              </button>
+              <button
+                onClick={() => setAuthType("LOGIN")}
+                disabled={loading}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
+                  authType === "LOGIN"
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {loading && authType === "LOGIN" ? (
+                  <Loader2 className="animate-spin w-5 h-5 mx-auto" />
+                ) : (
+                  "Login"
+                )}
+              </button>
+            </div>
 
             <AnimatePresence mode="wait">
               <motion.form
@@ -398,28 +427,32 @@ const RegistrationPage = () => {
                   showPassword={showPassword}
                 />
                 <button
-  type="button"
-  onClick={authType === "REGISTER" ? handleSubmit : handlelogin}
-  disabled={loading}
-  className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out ${
-    loading ? "opacity-50 cursor-not-allowed" : ""
-  }`}
->
-  {loading ? (
-    <Loader2 className="animate-spin w-5 h-5 mx-auto" />
-  ) : authType === "REGISTER" ? (
-    "Register"
-  ) : (
-    "Login"
-  )}
-</button>
+                  type="button"
+                  onClick={() => {
+                    if (authType === "REGISTER") {
+                      handleSubmit();
+                    } else {
+                      handlelogin();
+                    }
+                  }}
+                  disabled={loading}
+                  className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {loading ? (
+                    <Loader2 className="animate-spin w-5 h-5 mx-auto" />
+                  ) : authType === "REGISTER" ? (
+                    "Register"
+                  ) : (
+                    "Login"
+                  )}
+                </button>
               </motion.form>
             </AnimatePresence>
           </div>
         </motion.div>
       </div>
-
-      <DeviceFingerprint onVisitorIdCaptured={handleVisitorId} />
     </div>
   );
 };

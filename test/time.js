@@ -622,11 +622,11 @@ function startTokenCheck() {
 
     if (validToken) {
       if (lastValidToken !== validToken.token) {
-        console.log("Valid Token Found:", validToken.token); // Log valid token if it's different
+        // console.log("Valid Token Found:", validToken.token); // Log valid token if it's different
         lastValidToken = validToken.token;
       }
     } else {
-      console.log("No valid token found yet.");
+      console.log("No valid Qr found yet.");
     }
   }, 1000); // Check every 1 second
 }
@@ -634,7 +634,7 @@ function startTokenCheck() {
 // Function to stop checking for the valid token
 function stopTokenCheck() {
   clearInterval(intervalId); // Stop the interval when required
-  console.log("Token check stopped.");
+  // console.log("Token check stopped.");
 }
 
 // Call startTokenCheck to begin checking

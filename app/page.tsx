@@ -23,7 +23,6 @@ import {
   Button,
 } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import DeviceFingerprint from "./components/DeviceFingerprint";
 import { AppDispatch, useAppSelector } from "@/redux/store";
 import { getCookie } from "cookies-next";
 import { useDispatch } from "react-redux";
@@ -41,14 +40,10 @@ const Home: NextPage = () => {
   const [isAttendanceGiving, setisAttendanceGiving] = useState(false);
   const [visitorId, setVisitorId] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
-  const todaysDate = new Date().toISOString().split("T")[0];
+  const todaysDate = new Date().toLocaleDateString();
+  const [isEligible, setisEligible] = useState<Boolean>(true);
   // console.log(todaysDate);
-  const handleVisitorId = (id: string) => {
-    if (!visitorId) {
-      setVisitorId(id);
-      console.log("Captured Visitor ID:", id);
-    }
-  };
+
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -61,9 +56,16 @@ const Home: NextPage = () => {
   const lastAttended = useAppSelector(
     (state) => state.profileReducer.value.lastAttended
   );
+  const localSavedVID = localStorage.getItem("visitor_id");
   // console.log(lastAttended);
+
+  useEffect(() => {
+    if (lastAttended === todaysDate) {
+      setisEligible(false);
+    }
+  }, [lastAttended, todaysDate]);
   const giveAttendance = async (scannedData: string) => {
-    console.log("API HIT...");
+    // console.log("API HIT...");
     try {
       const headersList = {
         Accept: "*/*",
@@ -72,7 +74,7 @@ const Home: NextPage = () => {
       };
       let bodyContent = JSON.stringify({
         jwt: scannedData,
-        vid: visitorId,
+        vid: localSavedVID,
       });
 
       const response = await fetch(
@@ -91,7 +93,7 @@ const Home: NextPage = () => {
         setIsScannerActive(false);
         dispatch(
           updateProfile({
-            lastAttended: new Date().toISOString().split("T")[0],
+            lastAttended: new Date().toLocaleDateString(),
           })
         );
       } else {
@@ -104,7 +106,6 @@ const Home: NextPage = () => {
       setisAttendanceGiving(false);
     }
   };
-  const isEligible = todaysDate === lastAttended ? false : true;
 
   // console.log(lastAttended);
   // console.log("today's date", todaysDate);
@@ -218,11 +219,11 @@ const Home: NextPage = () => {
                     paused={isAttendanceGiving}
                     onScan={(result) => {
                       if (result) {
-                        console.log("Scan Result:", result);
+                        // console.log("Scan Result:", result);
                         const scannedData = result[0]?.rawValue;
                         if (scannedData) {
                           setisAttendanceGiving(true);
-                          console.log("Scanned Data:", scannedData);
+                          // console.log("Scanned Data:", scannedData);
                           setData(scannedData);
                           giveAttendance(scannedData);
                         }
@@ -337,8 +338,6 @@ const Home: NextPage = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
-
-      <DeviceFingerprint onVisitorIdCaptured={handleVisitorId} />
 
       {/* Footer */}
       <div className="w-full text-center p-4 text-gray-600 dark:text-gray-400">

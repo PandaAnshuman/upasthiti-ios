@@ -31,13 +31,13 @@ const page = () => {
         {
           name: "ANSHUMAN PANDA",
           role: "Full stack Developer | Machine Learning Engineer | Upcoming SWE Intern @JP Morgan Chase & Co.",
-          photo: "/placeholder.svg?height=300&width=300&text=AP",
+          photo: "/images/anshu.jpeg",
           link: "https://www.linkedin.com/in/anshuman-panda-575562258/",
         },
         {
           name: "SUBHRANSHU CHOUDHURY",
           role: "MERN | Ethical Hacker & Cyber Expert | Native and Web3 Developer | YouTuber | Fullstack Developer @Timepay.ai",
-          photo: "/placeholder.svg?height=300&width=300&text=SC",
+          photo: "/images/subhransu.jpeg",
           link: "https://www.linkedin.com/in/subhranshusekharchoudhury/",
         },
         {
@@ -48,8 +48,8 @@ const page = () => {
         },
         {
           name: "SOHAIL KHAN",
-          role: "MERN | Ethical Hacker & Cyber Expert | Native and Web3 Developer | YouTuber | Fullstack Developer @Timepay.ai",
-          photo: "/placeholder.svg?height=300&width=300&text=SC",
+          role: "MERN | Ethical Hacker & Bug Bounty Hunter",
+          photo: "/images/sohail.jpeg",
           link: "https://www.linkedin.com/in/sohail-khan-coder/",
         },
       ],
