@@ -148,13 +148,17 @@ const RegistrationPage = () => {
       const localSavedVID = localStorage.getItem("visitor_id");
 
       if (localSavedVID) {
-        toast.error(
-          `The device is already registered with ${
-            decryptData(localSavedVID)?.split("-")[0]
-          }`
-        );
-        return;
+        const registeredID = decryptData(localSavedVID).split("-")[0];
+        if (registeredID !== formData.registration_no) {
+          toast.error(
+            `The device is already registered with ${
+              decryptData(localSavedVID)?.split("-")[0]
+            }`
+          );
+          return;
+        }
       }
+    
 
       const vid = encryptData(`${formData.registration_no}-${formData.email}`);
 

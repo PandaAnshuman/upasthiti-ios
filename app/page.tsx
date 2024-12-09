@@ -38,7 +38,7 @@ const Home: NextPage = () => {
   const [attendanceMessage, setAttendanceMessage] = useState(""); // State for showing the attendance message
   const token = getCookie("token"); // Get the token from the cookie
   const [isAttendanceGiving, setisAttendanceGiving] = useState(false);
-  const [visitorId, setVisitorId] = useState<string>("");
+  // const [visitorId, setVisitorId] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
   const todaysDate = new Date().toLocaleDateString();
   const [isEligible, setisEligible] = useState<Boolean>(true);
