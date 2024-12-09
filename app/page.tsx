@@ -42,6 +42,7 @@ const Home: NextPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const todaysDate = new Date().toLocaleDateString();
   const [isEligible, setisEligible] = useState<Boolean>(true);
+  const [isAttendaceError, setisAttendaceError] = useState<Boolean>(false);
   // console.log(todaysDate);
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -90,6 +91,7 @@ const Home: NextPage = () => {
 
       if (response.ok) {
         setAttendanceMessage(responseData.message);
+        setisAttendaceError(false);
         setIsScannerActive(false);
         dispatch(
           updateProfile({
@@ -97,11 +99,13 @@ const Home: NextPage = () => {
           })
         );
       } else {
+        setisAttendaceError(true);
         setAttendanceMessage(responseData.message);
       }
     } catch (error) {
       console.error("Error marking attendance:", error);
       setAttendanceMessage("An error occurred while marking attendance.");
+      setisAttendaceError(true);
     } finally {
       setisAttendanceGiving(false);
     }
@@ -166,6 +170,29 @@ const Home: NextPage = () => {
         {isEligible ? (
           <>
             {/* Scan QR and Show QR Buttons */}
+            {/* Attendance Message */}
+            {attendanceMessage && (
+              <div
+                className={`w-full p-4 ${
+                  isAttendaceError ? "bg-red-300" : "bg-green-100"
+                } rounded-xl shadow-md`}
+              >
+                <h2
+                  className={`text-lg font-semibold ${
+                    isAttendaceError ? "text-red-800 " : "text-green-800"
+                  }`}
+                >
+                  Attendance Status
+                </h2>
+                <p
+                  className={`text-base ${
+                    isAttendaceError ? "text-red-700" : "text-green-700"
+                  } break-words`}
+                >
+                  {attendanceMessage}
+                </p>
+              </div>
+            )}
             {!isQrVisible && id && (
               <div className="space-y-4">
                 {!isScannerActive && (
@@ -267,17 +294,6 @@ const Home: NextPage = () => {
                   <CircleX size={24} />
                   <span>Close</span>
                 </button>
-              </div>
-            )}
-            {/* Attendance Message */}
-            {attendanceMessage && (
-              <div className="w-full p-4 bg-green-100 rounded-xl shadow-md">
-                <h2 className="text-lg font-semibold text-green-800">
-                  Attendance Status
-                </h2>
-                <p className="text-base text-green-700 break-words">
-                  {attendanceMessage}
-                </p>
               </div>
             )}
           </>
