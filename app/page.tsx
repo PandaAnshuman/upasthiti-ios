@@ -356,13 +356,11 @@ const Home: NextPage = () => {
       </Modal>
 
       {/* Footer */}
-      <div className="w-full text-center p-4 text-gray-600 dark:text-gray-400">
-        <h1>
-          Developed By:{" "}
-          <a href="" className="underline">
-            Dev verse
-          </a>
-        </h1>
+      <div className=" w-full text-center p-4 text-gray-600 dark:text-gray-400">
+        <p>
+          &copy; {new Date().getFullYear()}{" "}
+          <span className="font-semibold">Devverse</span>
+        </p>
       </div>
 
       <style jsx global>{`
