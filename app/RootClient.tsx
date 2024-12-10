@@ -12,7 +12,7 @@ export default function RootClient() {
     // Block F12 key
     const blockKeyCombinations = (event: KeyboardEvent) => {
       if (
-        // event.key === "F12" || // Block F12
+        event.key === "F12" || // Block F12
         ((event.ctrlKey || event.metaKey) && event.key === "U") || // Block Ctrl+U
         ((event.ctrlKey || event.metaKey) &&
           event.shiftKey &&
@@ -29,7 +29,7 @@ export default function RootClient() {
         ((event.ctrlKey || event.metaKey) && event.key === "S") // Block Ctrl+S
       ) {
         event.preventDefault();
-        alert("This action is disabled!");
+        
       }
     };
     window.addEventListener("keydown", blockKeyCombinations);
