@@ -13,9 +13,10 @@ const page = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
+    console.log("Hello from logout page");
+    dispatch(resetProfile());
     pb.authStore.clear();
     deleteCookie("token");
-    dispatch(resetProfile());
     router.replace("/auth");
   }, []);
   return (
