@@ -47,6 +47,7 @@ const Home: NextPage = () => {
   // console.log(todaysDate);
 
   const [currentTime, setCurrentTime] = useState(new Date());
+  const newToken = useAppSelector((state) => state.profileReducer.value.token);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -71,7 +72,7 @@ const Home: NextPage = () => {
     try {
       const headersList = {
         Accept: "*/*",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${newToken}`,
         "Content-Type": "application/json",
       };
       let bodyContent = JSON.stringify({
