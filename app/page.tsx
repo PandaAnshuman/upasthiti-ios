@@ -101,7 +101,6 @@ const Home: NextPage = () => {
       );
     } else if (response.status === 401) {
       // Show a toast message prompting re-login
-      toast.error("Session expired. Please log in again.");
       setAttendanceMessage("Session expired. Please log in again.");
       setisAttendaceError(true);
     } else {
