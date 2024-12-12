@@ -68,51 +68,56 @@ const Home: NextPage = () => {
     }
   }, [lastAttended, todaysDate]);
   const giveAttendance = async (scannedData: string) => {
-    // console.log("API HIT...");
-    try {
-      const headersList = {
-        Accept: "*/*",
-        Authorization: `Bearer ${newToken}`,
-        "Content-Type": "application/json",
-      };
-      let bodyContent = JSON.stringify({
-        jwt: scannedData,
-        vid: localSavedVID,
-      });
+  try {
+    const headersList = {
+      Accept: "*/*",
+      Authorization: `Bearer ${newToken}`,
+      "Content-Type": "application/json",
+    };
+    let bodyContent = JSON.stringify({
+      jwt: scannedData,
+      vid: localSavedVID,
+    });
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/give-attendance`,
-        {
-          method: "POST",
-          headers: headersList,
-          body: bodyContent,
-        }
-      );
-
-      const responseData = await response.json();
-
-      if (response.ok) {
-        setAttendanceMessage(responseData.message);
-        setisAttendaceError(false);
-        setIsScannerActive(false);
-        dispatch(
-          updateProfile({
-            lastAttended: new Date().toLocaleDateString(),
-          })
-        );
-      } else {
-        setisAttendaceError(true);
-        setAttendanceMessage(responseData.message);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/give-attendance`,
+      {
+        method: "POST",
+        headers: headersList,
+        body: bodyContent,
       }
-    } catch (error) {
-      console.error("Error marking attendance:", error);
-      setAttendanceMessage("An error occurred while marking attendance.");
-      setisAttendaceError(true);
-    } finally {
-      setisAttendanceGiving(false);
-    }
-  };
+    );
 
+    const responseData = await response.json();
+
+    if (response.ok) {
+      setAttendanceMessage(responseData.message);
+      setisAttendaceError(false);
+      setIsScannerActive(false);
+      dispatch(
+        updateProfile({
+          lastAttended: new Date().toLocaleDateString(),
+        })
+      );
+    } else if (response.status === 401) {
+      // Show a toast message prompting re-login
+      toast.error("Session expired. Please log in again.");
+      setAttendanceMessage("Session expired. Please log in again.");
+      setisAttendaceError(true);
+    } else {
+      setisAttendaceError(true);
+      setAttendanceMessage(responseData.message);
+    }
+  } catch (error) {
+    console.error("Error marking attendance:", error);
+    setAttendanceMessage("An error occurred while marking attendance.");
+    setisAttendaceError(true);
+  } finally {
+    setisAttendanceGiving(false);
+  }
+};
+  
+      
   // console.log(lastAttended);
   // console.log("today's date", todaysDate);
   // console.log(lastAttended);
