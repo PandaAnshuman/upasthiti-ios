@@ -20,7 +20,7 @@ const page = () => {
         {
           name: "PAWAN KUMAR",
           role: "Ex-FTC Intern@Fidelity International | Flutter App Developer | Solving for India Regional Qualified | HackOn with Amazon'22",
-          photo: "/placeholder.svg?height=300&width=300&text=PK",
+          photo: "/images/pawanbhai.png",
           link: "https://www.linkedin.com/in/pawan-k-9490581b5/",
         },
       ],
