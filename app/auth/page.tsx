@@ -457,6 +457,16 @@ const RegistrationPage = () => {
           </div>
         </motion.div>
       </div>
+      {/* Footer */}
+      <div className=" w-full text-center p-4 text-gray-600 dark:text-gray-400">
+        <p>
+          &copy; {new Date().getFullYear()}{" "}
+          <span className="font-semibold">Devverse</span>
+        </p>
+        <span className="font-semibold">
+          <a href="/issue-solve">Unban or Solve your issue</a>
+        </span>
+      </div>
     </div>
   );
 };

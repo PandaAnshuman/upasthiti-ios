@@ -55,6 +55,9 @@ const Home: NextPage = () => {
   }, []);
 
   const id = useAppSelector((state) => state.profileReducer.value.id);
+  const regdNo = useAppSelector(
+    (state) => state.profileReducer.value.registration_no
+  );
   const name = useAppSelector((state) => state.profileReducer.value.name);
   const lastAttended = useAppSelector(
     (state) => state.profileReducer.value.lastAttended
@@ -68,55 +71,54 @@ const Home: NextPage = () => {
     }
   }, [lastAttended, todaysDate]);
   const giveAttendance = async (scannedData: string) => {
-  try {
-    const headersList = {
-      Accept: "*/*",
-      Authorization: `Bearer ${newToken}`,
-      "Content-Type": "application/json",
-    };
-    let bodyContent = JSON.stringify({
-      jwt: scannedData,
-      vid: localSavedVID,
-    });
+    try {
+      const headersList = {
+        Accept: "*/*",
+        Authorization: `Bearer ${newToken}`,
+        "Content-Type": "application/json",
+      };
+      let bodyContent = JSON.stringify({
+        jwt: scannedData,
+        vid: localSavedVID,
+      });
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/give-attendance`,
-      {
-        method: "POST",
-        headers: headersList,
-        body: bodyContent,
-      }
-    );
-
-    const responseData = await response.json();
-
-    if (response.ok) {
-      setAttendanceMessage(responseData.message);
-      setisAttendaceError(false);
-      setIsScannerActive(false);
-      dispatch(
-        updateProfile({
-          lastAttended: new Date().toLocaleDateString(),
-        })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/give-attendance`,
+        {
+          method: "POST",
+          headers: headersList,
+          body: bodyContent,
+        }
       );
-    } else if (response.status === 401) {
-      // Show a toast message prompting re-login
-      setAttendanceMessage("Session expired. Please log in again.");
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        setAttendanceMessage(responseData.message);
+        setisAttendaceError(false);
+        setIsScannerActive(false);
+        dispatch(
+          updateProfile({
+            lastAttended: new Date().toLocaleDateString(),
+          })
+        );
+      } else if (response.status === 401) {
+        // Show a toast message prompting re-login
+        setAttendanceMessage("Session expired. Please log in again.");
+        setisAttendaceError(true);
+      } else {
+        setisAttendaceError(true);
+        setAttendanceMessage(responseData.message);
+      }
+    } catch (error) {
+      console.error("Error marking attendance:", error);
+      setAttendanceMessage("An error occurred while marking attendance.");
       setisAttendaceError(true);
-    } else {
-      setisAttendaceError(true);
-      setAttendanceMessage(responseData.message);
+    } finally {
+      setisAttendanceGiving(false);
     }
-  } catch (error) {
-    console.error("Error marking attendance:", error);
-    setAttendanceMessage("An error occurred while marking attendance.");
-    setisAttendaceError(true);
-  } finally {
-    setisAttendanceGiving(false);
-  }
-};
-  
-      
+  };
+
   // console.log(lastAttended);
   // console.log("today's date", todaysDate);
   // console.log(lastAttended);
@@ -148,6 +150,7 @@ const Home: NextPage = () => {
                   {name.split(" ")[0].toUpperCase()}
                   <span className="wave inline-block">👋</span>
                 </h2>
+                <p>{regdNo}</p>
               </div>
               <a href="/profile" className="ml-4 flex items-center">
                 <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border-4 border-white/30">

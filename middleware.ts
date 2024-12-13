@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Allow '/not-allowed' without restrictions
-  if (url.pathname === '/not-allowed' || url.pathname === '/developer-debug' || url.pathname === '/logout') {
+  if (url.pathname === '/not-allowed' || url.pathname === '/developer-debug' || url.pathname === '/logout' || url.pathname === '/issue-solve') {
     return NextResponse.next();
   }
 
