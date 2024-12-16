@@ -126,7 +126,7 @@ const RegistrationPage = () => {
     password: yup
       .string()
       .required("Password is required")
-      .min(5, "Password must be at least 8 characters"),
+      .min(8, "Password must be at least 8 characters"),
   });
 
   const handleInputChange = (
@@ -158,7 +158,6 @@ const RegistrationPage = () => {
           return;
         }
       }
-    
 
       const vid = encryptData(`${formData.registration_no}-${formData.email}`);
 
@@ -175,19 +174,22 @@ const RegistrationPage = () => {
       }
     } catch (error: any) {
       if (error instanceof yup.ValidationError) {
-        toast.error(error.inner[0]?.message || "Validation failed");
+        // Loop through all validation errors and show them
+        error.inner.forEach((err) => {
+          toast.error(err.message || "Validation failed");
+        });
       } else if (error.response?.data) {
         toast.error(
           error.response.data.message || "Failed to create a record."
         );
       } else {
-        // console.error("Unexpected Error:", error);
         toast.error("An unexpected error occurred.");
       }
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handlelogin = async (vid?: string) => {
     let localSavedVID = localStorage.getItem("visitor_id");
