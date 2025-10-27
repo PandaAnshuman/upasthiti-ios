@@ -1,34 +1,34 @@
 "use client";
-import type { NextPage } from "next";
-import {
-  ScanQrCode,
-  QrCode,
-  Info,
-  User,
-  CircleX,
-  Calendar,
-  Clock,
-  ChevronRight,
-  Zap,
-  CheckCircle,
-} from "lucide-react";
-import TeamProfile from "./components/About-us/page";
-import { Scanner } from "@yudiel/react-qr-scanner";
-import QRCode from "react-qr-code";
+import { updateProfile } from "@/redux/features/profile-slice";
+import { AppDispatch, useAppSelector } from "@/redux/store";
 import {
   Modal,
-  ModalContent,
   ModalBody,
-  useDisclosure,
-  Button,
+  ModalContent,
+  useDisclosure
 } from "@nextui-org/react";
-import { useEffect, useState } from "react";
-import { AppDispatch, useAppSelector } from "@/redux/store";
+import { Scanner } from "@yudiel/react-qr-scanner";
 import { getCookie } from "cookies-next";
-import { useDispatch } from "react-redux";
-import { updateProfile } from "@/redux/features/profile-slice";
-import "./globals.css";
+import {
+  Calendar,
+  CheckCircle,
+  CircleX,
+  Clock,
+  Info,
+  QrCode,
+  ScanQrCode,
+  User,
+  Zap
+} from "lucide-react";
+import type { NextPage } from "next";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import QRCode from "react-qr-code";
+import { useDispatch } from "react-redux";
+import TeamProfile from "./components/About-us/page";
+import { PromotionModal } from "./components/PromotionModal";
+import { Resumeflow } from "./components/Resumeflow";
+import "./globals.css";
 // import Loader from "./components/loader/page";
 
 const Home: NextPage = () => {
@@ -65,10 +65,14 @@ const Home: NextPage = () => {
   const localSavedVID = localStorage.getItem("visitor_id");
   // console.log(lastAttended);
 
+  const { isOpen: isOpenPromotionModal, onClose: onClosePromotionModal, onOpen: onOpenPromotionModal } = useDisclosure({
+  })
+
   useEffect(() => {
     if (lastAttended === todaysDate) {
       setisEligible(false);
     }
+    onOpenPromotionModal()
   }, [lastAttended, todaysDate]);
   const giveAttendance = async (scannedData: string) => {
     try {
@@ -182,26 +186,24 @@ const Home: NextPage = () => {
             {/* Attendance Message */}
             {attendanceMessage && (
               <div
-                className={`w-full p-4 ${
-                  isAttendaceError ? "bg-red-300" : "bg-green-100"
-                } rounded-xl shadow-md`}
+                className={`w-full p-4 ${isAttendaceError ? "bg-red-300" : "bg-green-100"
+                  } rounded-xl shadow-md`}
               >
                 <h2
-                  className={`text-lg font-semibold ${
-                    isAttendaceError ? "text-red-800 " : "text-green-800"
-                  }`}
+                  className={`text-lg font-semibold ${isAttendaceError ? "text-red-800 " : "text-green-800"
+                    }`}
                 >
                   Attendance Status
                 </h2>
                 <p
-                  className={`text-base ${
-                    isAttendaceError ? "text-red-700" : "text-green-700"
-                  } break-words`}
+                  className={`text-base ${isAttendaceError ? "text-red-700" : "text-green-700"
+                    } break-words`}
                 >
                   {attendanceMessage}
                 </p>
               </div>
             )}
+            {!isQrVisible && id && !isScannerActive && <Resumeflow />}
             {!isQrVisible && id && (
               <div className="space-y-4">
                 {!isScannerActive && (
@@ -321,26 +323,6 @@ const Home: NextPage = () => {
           </>
         )}
       </div>
-      {/* <div className="bg-white dark:bg-gray-500 rounded-xl shadow-lg w-full max-w-md p-6 ">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
-          Quick Links
-        </h3>
-        <ul className="space-y-2">
-          {["Today's Schedule", "Upcoming Exams", "Course Materials"].map(
-            (item, index) => (
-              <li key={index}>
-                <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex justify-between items-center">
-                  <span className="text-gray-700 dark:text-gray-300">
-                    {item}
-                  </span>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </button>
-              </li>
-            )
-          )}
-        </ul>
-      </div> */}
-
       {/* About Button */}
       <div className="fixed bottom-4 right-4 z-50">
         <Link
@@ -362,6 +344,7 @@ const Home: NextPage = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+      <PromotionModal isOpen={isOpenPromotionModal} onClose={onClosePromotionModal} />
 
       {/* Footer */}
       <div className=" w-full text-center p-4 text-gray-600 dark:text-gray-400">
