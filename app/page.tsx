@@ -26,8 +26,8 @@ import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import { useDispatch } from "react-redux";
 import TeamProfile from "./components/About-us/page";
-import { PromotionModal } from "./components/PromotionModal";
-import { Resumeflow } from "./components/Resumeflow";
+// import { PromotionModal } from "./components/PromotionModal";
+// import { Resumeflow } from "./components/Resumeflow";
 import "./globals.css";
 // import Loader from "./components/loader/page";
 
@@ -65,14 +65,14 @@ const Home: NextPage = () => {
   const localSavedVID = localStorage.getItem("visitor_id");
   // console.log(lastAttended);
 
-  const { isOpen: isOpenPromotionModal, onClose: onClosePromotionModal, onOpen: onOpenPromotionModal } = useDisclosure({
-  })
+  // const { isOpen: isOpenPromotionModal, onClose: onClosePromotionModal, onOpen: onOpenPromotionModal } = useDisclosure({
+  // })
 
   useEffect(() => {
     if (lastAttended === todaysDate) {
       setisEligible(false);
     }
-    onOpenPromotionModal()
+    // onOpenPromotionModal()
   }, [lastAttended, todaysDate]);
   const giveAttendance = async (scannedData: string) => {
     try {
@@ -203,7 +203,7 @@ const Home: NextPage = () => {
                 </p>
               </div>
             )}
-            {!isQrVisible && id && !isScannerActive && <Resumeflow />}
+            {/* {!isQrVisible && id && !isScannerActive && <Resumeflow />} */}
             {!isQrVisible && id && (
               <div className="space-y-4">
                 {!isScannerActive && (
@@ -344,7 +344,7 @@ const Home: NextPage = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <PromotionModal isOpen={isOpenPromotionModal} onClose={onClosePromotionModal} />
+      {/* <PromotionModal isOpen={isOpenPromotionModal} onClose={onClosePromotionModal} /> */}
 
       {/* Footer */}
       <div className=" w-full text-center p-4 text-gray-600 dark:text-gray-400">
