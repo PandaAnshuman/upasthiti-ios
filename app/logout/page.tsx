@@ -17,7 +17,7 @@ const page = () => {
     dispatch(resetProfile());
     pb.authStore.clear();
     deleteCookie("token");
-    router.replace("/auth");
+    window.location.replace("/auth");
   }, []);
   return (
     <div>
