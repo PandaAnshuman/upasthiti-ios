@@ -264,10 +264,11 @@ const RegistrationPage = () => {
         });
       } else if (error.response?.data) {
         toast.error(
-          error.response.data.message || "Failed to create a record."
+          error.response.message || "Failed to create a record."
         );
       } else {
-        toast.error("An unexpected error occurred.");
+        // console.log(error.response.message);
+        toast.error(error.response.message);
       }
     } finally {
       setLoading(false);
