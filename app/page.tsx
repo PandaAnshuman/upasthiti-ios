@@ -62,7 +62,7 @@ const Home: NextPage = () => {
   const lastAttended = useAppSelector(
     (state) => state.profileReducer.value.lastAttended
   );
-  const localSavedVID = localStorage.getItem("visitor_id");
+  // visitor_id no longer used on this page
   // console.log(lastAttended);
 
   // const { isOpen: isOpenPromotionModal, onClose: onClosePromotionModal, onOpen: onOpenPromotionModal } = useDisclosure({
@@ -83,7 +83,6 @@ const Home: NextPage = () => {
       };
       let bodyContent = JSON.stringify({
         jwt: scannedData,
-        vid: localSavedVID,
       });
 
       const response = await fetch(
@@ -186,18 +185,21 @@ const Home: NextPage = () => {
             {/* Attendance Message */}
             {attendanceMessage && (
               <div
-                className={`w-full p-4 ${isAttendaceError ? "bg-red-300" : "bg-green-100"
-                  } rounded-xl shadow-md`}
+                className={`w-full p-4 ${
+                  isAttendaceError ? "bg-red-300" : "bg-green-100"
+                } rounded-xl shadow-md`}
               >
                 <h2
-                  className={`text-lg font-semibold ${isAttendaceError ? "text-red-800 " : "text-green-800"
-                    }`}
+                  className={`text-lg font-semibold ${
+                    isAttendaceError ? "text-red-800 " : "text-green-800"
+                  }`}
                 >
                   Attendance Status
                 </h2>
                 <p
-                  className={`text-base ${isAttendaceError ? "text-red-700" : "text-green-700"
-                    } break-words`}
+                  className={`text-base ${
+                    isAttendaceError ? "text-red-700" : "text-green-700"
+                  } break-words`}
                 >
                   {attendanceMessage}
                 </p>
