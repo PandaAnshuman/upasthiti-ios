@@ -375,11 +375,10 @@ const RegistrationPage = () => {
               <button
                 onClick={() => setAuthType("REGISTER")}
                 disabled={loading}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
-                  authType === "REGISTER"
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${authType === "REGISTER"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {loading && authType === "REGISTER" ? (
                   <Loader2 className="animate-spin w-5 h-5 mx-auto" />
@@ -390,11 +389,10 @@ const RegistrationPage = () => {
               <button
                 onClick={() => setAuthType("LOGIN")}
                 disabled={loading}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${
-                  authType === "LOGIN"
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition duration-300 ${authType === "LOGIN"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {loading && authType === "LOGIN" ? (
                   <Loader2 className="animate-spin w-5 h-5 mx-auto" />
@@ -507,9 +505,8 @@ const RegistrationPage = () => {
                     }
                   }}
                   disabled={loading}
-                  className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out ${
-                    loading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out ${loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   {loading ? (
                     <Loader2 className="animate-spin w-5 h-5 mx-auto" />
@@ -536,35 +533,14 @@ const RegistrationPage = () => {
                       type="button"
                       onClick={handleGoogleSignIn}
                       disabled={loading}
-                      className={`w-full py-3 px-4 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white font-semibold rounded-lg shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out flex items-center justify-center gap-2 ${
-                        loading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                      className={`w-full py-3 px-4 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white font-semibold rounded-lg shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out flex items-center justify-center gap-2 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     >
-                      <span className="w-5 h-5 inline-block">
-                        <svg
-                          viewBox="0 0 48 48"
-                          className="w-full h-full"
-                          xmlns="http://www.w3.org/2000/svg"
-                          aria-hidden
-                        >
-                          <path
-                            fill="#EA4335"
-                            d="M24 9.5c3.5 0 5.9 1.5 7.3 2.8l5.4-5.3C33.5 4 28.9 2.5 24 2.5 14.9 2.5 7.7 8.8 4.6 17.1l6.5 5.1C12.9 16 18 9.5 24 9.5z"
-                          />
-                          <path
-                            fill="#34A853"
-                            d="M46.5 24c0-1.6-.1-2.8-.4-4H24v8h12.7c-.5 3-2.4 5.5-5.2 7.2l5.1 4c4.7-4.3 7.9-10.8 7.9-15.2z"
-                          />
-                          <path
-                            fill="#4A90E2"
-                            d="M10.1 27.7A14.9 14.9 0 0 1 9 24c0-1.3.2-2.6.6-3.7l-6.5-5.1C1.4 16.9 0 20.3 0 24c0 3.7 1.4 7 3.6 9.5l6.5-5.8z"
-                          />
-                          <path
-                            fill="#FBBC05"
-                            d="M24 46.5c4.9 0 9-1.6 12.2-4.3l-5.9-4.5C29.4 38.5 26.8 39.3 24 39.3c-6 0-11.1-6.5-13-15.6l-6.5 5.1C7.7 39.7 14.9 46.5 24 46.5z"
-                          />
-                        </svg>
-                      </span>
+                      <img
+                        src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/google/google-original.svg"
+                        alt="Google G Logo"
+                        className="w-5 h-5"
+                      />
                       Continue with Google
                     </button>
                   </>
