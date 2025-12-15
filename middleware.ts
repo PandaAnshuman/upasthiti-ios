@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const token = request.cookies.get('token')?.value;
 
-  // Exclude static assets from middleware processing
+  static assets from middleware processing
   if (url.pathname.startsWith('/_next') || url.pathname.startsWith('/static')) {
     return NextResponse.next();
   }
