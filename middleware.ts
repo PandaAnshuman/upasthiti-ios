@@ -18,7 +18,11 @@ export function middleware(request: NextRequest) {
 
   // Block laptops, desktops, and iPads
   if (/Macintosh|Windows|iPad/i.test(userAgent)) {
-    return NextResponse.redirect(new URL('/not-allowed', request.url));
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Access blocked for device with user-agent:', userAgent);
+    } else {
+      return NextResponse.redirect(new URL('/not-allowed', request.url));
+    }
   }
 
   // Redirect to '/auth' if no token and not already on '/auth'
