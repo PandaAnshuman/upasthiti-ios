@@ -49,6 +49,9 @@ const Home: NextPage = () => {
 
   const todaysDate = new Date().toLocaleDateString();
   const [isEligible, setisEligible] = useState<Boolean>(true);
+  // Allow disabling QR via env for testing
+  const DISABLE_QR = process.env.NEXT_PUBLIC_DISABLE_QR === "true";
+  const effectiveEligible = DISABLE_QR ? false : isEligible;
   const [isAttendaceError, setisAttendaceError] = useState<Boolean>(false);
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -98,34 +101,50 @@ const Home: NextPage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Eligibility Check Effect (old logic: only one scan per day)
-  // useEffect(() => {
-  //   if (lastAttended === todaysDate) {
-  //     setisEligible(false);
-  //   } else {
-  //     setisEligible(true);
-  //     setAttendanceMessage("");
-  //     setisAttendaceError(false);
-  //   }
-  // }, [lastAttended, todaysDate]);
 
-  // New logic: Check if 5 minutes have passed since last scan
+  // --- 5-Minute Timer State ---
+  const [cooldownRemaining, setCooldownRemaining] = useState(0); // ms
+
+  // New logic: Check if 5 minutes have passed since last scan, and set timer
   useEffect(() => {
     const lastScan = localStorage.getItem("lastAttendanceScan");
+    const now = Date.now();
     if (lastScan) {
       const last = parseInt(lastScan, 10);
-      const now = Date.now();
-      if (now - last < 5 * 60 * 1000) {
+      const diff = now - last;
+      const cooldown = 5 * 60 * 1000;
+      if (diff < cooldown) {
         setisEligible(false);
-        setAttendanceMessage("You must wait 5 minutes between scans.");
-        setisAttendaceError(true);
+        setAttendanceMessage("Attendance recorded. The next attendance will be in next 5 min.");
+        setisAttendaceError(false);
+        setCooldownRemaining(cooldown - diff);
         return;
       }
     }
     setisEligible(true);
     setAttendanceMessage("");
     setisAttendaceError(false);
+    setCooldownRemaining(0);
   }, [lastAttended, todaysDate]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (!isEligible && cooldownRemaining > 0) {
+      const interval = setInterval(() => {
+        setCooldownRemaining((prev) => {
+          if (prev <= 1000) {
+            setisEligible(true);
+            setAttendanceMessage("");
+            setisAttendaceError(false);
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1000;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isEligible, cooldownRemaining]);
 
   // Dynamic QR Code Generation and Refresh Effect
   useEffect(() => {
@@ -253,7 +272,7 @@ const Home: NextPage = () => {
           </div>
         </div>
 
-        {isEligible ? (
+        {effectiveEligible ? (
           <>
             {/* Attendance Message */}
             {attendanceMessage && (
@@ -410,16 +429,54 @@ const Home: NextPage = () => {
 
           </>
         ) : (
-          /* Already Attended Message */
-          <div className="w-full p-4 h-30 bg-green-100 rounded-xl shadow-md">
+          /* Attendance Cooldown Message */
+          <div className="w-full p-4 h-30 bg-green-100 rounded-xl shadow-md flex flex-col items-center">
             <h2 className="text-lg font-semibold text-green-800 flex items-center">
               <Calendar className="mr-2 text-green-800" />
               Attendance Status
             </h2>
-            <p className="text-base text-green-700 break-words flex items-center">
+            <p className="text-base text-green-700 break-words flex items-center mb-2">
               <CheckCircle className="mr-2 text-green-700" />
-              You have already marked your attendance for today.
+              Attendance recorded. The next attendance will be in next 5 min.
             </p>
+            {cooldownRemaining > 0 && (
+              <div className="flex flex-col items-center mt-2">
+                <span className="flex items-center gap-2 px-6 py-2 mb-4 rounded-2xl bg-white/30 border border-blue-300 text-base font-medium text-blue-900 shadow-lg backdrop-blur-md" style={{boxShadow: '0 4px 24px 0 rgba(80, 120, 255, 0.10)', borderWidth: 1.5, borderStyle: 'solid', borderColor: '#60a5fa', WebkitBackdropFilter: 'blur(12px)', backdropFilter: 'blur(12px)'}}>
+                  <Clock className="w-5 h-5 text-blue-400 drop-shadow" />
+                  Next attendance in
+                </span>
+                <div className="relative flex items-center justify-center">
+                  <svg className="w-24 h-24" viewBox="0 0 100 100">
+                    <circle
+                      cx="50" cy="50" r="45"
+                      className="stroke-gray-300"
+                      strokeWidth="8"
+                      fill="none"
+                    />
+                    <circle
+                      cx="50" cy="50" r="45"
+                      className="stroke-blue-500 transition-all duration-500"
+                      strokeWidth="8"
+                      fill="none"
+                      strokeDasharray={2 * Math.PI * 45}
+                      strokeDashoffset={
+                        2 * Math.PI * 45 * (1 - cooldownRemaining / (5 * 60 * 1000))
+                      }
+                      style={{ transition: 'stroke-dashoffset 1s linear' }}
+                    />
+                    <text
+                      x="50" y="56"
+                      textAnchor="middle"
+                      className="fill-blue-700 font-bold text-2xl"
+                      fontSize="2rem"
+                      fontFamily="monospace"
+                    >
+                      {`${Math.floor(cooldownRemaining / 60000)}:${String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, '0')}`}
+                    </text>
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
