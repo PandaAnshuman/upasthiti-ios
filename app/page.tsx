@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import { useDispatch } from "react-redux";
 import TeamProfile from "./components/About-us/page";
-import "./globals.css";
+import "./globals.css"; 
 import { toast } from "react-toastify";
 // useRouter is kept as it's used for navigation logic
 import { useRouter } from "next/navigation";
@@ -98,16 +98,33 @@ const Home: NextPage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Eligibility Check Effect
+  // Eligibility Check Effect (old logic: only one scan per day)
+  // useEffect(() => {
+  //   if (lastAttended === todaysDate) {
+  //     setisEligible(false);
+  //   } else {
+  //     setisEligible(true);
+  //     setAttendanceMessage("");
+  //     setisAttendaceError(false);
+  //   }
+  // }, [lastAttended, todaysDate]);
+
+  // New logic: Check if 5 minutes have passed since last scan
   useEffect(() => {
-    if (lastAttended === todaysDate) {
-      setisEligible(false);
-    } else {
-      setisEligible(true);
-      // Clear previous attendance message if eligible again (e.g., midnight passes)
-      setAttendanceMessage("");
-      setisAttendaceError(false);
+    const lastScan = localStorage.getItem("lastAttendanceScan");
+    if (lastScan) {
+      const last = parseInt(lastScan, 10);
+      const now = Date.now();
+      if (now - last < 5 * 60 * 1000) {
+        setisEligible(false);
+        setAttendanceMessage("You must wait 5 minutes between scans.");
+        setisAttendaceError(true);
+        return;
+      }
     }
+    setisEligible(true);
+    setAttendanceMessage("");
+    setisAttendaceError(false);
   }, [lastAttended, todaysDate]);
 
   // Dynamic QR Code Generation and Refresh Effect
@@ -153,9 +170,10 @@ const Home: NextPage = () => {
       if (response.ok) {
         setAttendanceMessage(responseData.message);
         setisAttendaceError(false);
-        // Important: Stop scanner and mark as ineligible for the day
+        // Important: Stop scanner and mark as ineligible for 5 minutes
         setIsScannerActive(false);
         setisEligible(false);
+        localStorage.setItem("lastAttendanceScan", Date.now().toString()); // Store scan time
         dispatch(
           updateProfile({
             lastAttended: new Date().toLocaleDateString(),
