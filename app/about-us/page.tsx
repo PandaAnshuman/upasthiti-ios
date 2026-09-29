@@ -15,7 +15,7 @@ const page = () => {
       ],
     },
     {
-      title: "Management & Development",
+      title: "Product Manager", 
       profiles: [
         {
           name: "PAWAN KUMAR",
