@@ -25,7 +25,7 @@ const page = () => {
         },
         {
           name: "SANAT SHIKHAR SINHA",
-          role: "Full stack Developer | AI/ML Engineer | App Developer | E-Cell SOA President",
+          role: "Full stack Developer | AI/ML Engineer | App Developer |\nE-Cell SOA President",
           photo: "/images/Sanat.png",
           link: "https://www.linkedin.com/in/sanatsinhaa/",
         },
@@ -119,7 +119,7 @@ const page = () => {
 
                     <div className="flex-grow">
                       <h3 className="font-bold text-lg mb-1">{profile.name}</h3>
-                      <p className="text-gray-700 text-sm mb-2">
+                      <p className="text-gray-700 text-sm mb-2 whitespace-pre-line">
                         {profile.role}
                       </p>
 
