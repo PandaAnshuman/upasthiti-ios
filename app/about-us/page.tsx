@@ -25,7 +25,7 @@ const page = () => {
         },
         {
           name: "SANAT SHIKHAR SINHA",
-          role: "Full stack Developer | AI/ML Engineer | App Developer | Cryptography | E-Cell SOA President",
+          role: "Full stack Developer | AI/ML Engineer | App Developer | E-Cell SOA President",
           photo: "/images/Sanat.png",
           link: "https://www.linkedin.com/in/sanatsinhaa/",
         },
