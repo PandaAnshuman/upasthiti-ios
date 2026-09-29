@@ -15,13 +15,19 @@ const page = () => {
       ],
     },
     {
-      title: "Product Manager",
+      title: "Management & Development",
       profiles: [
         {
           name: "PAWAN KUMAR",
           role: "Ex-FTC Intern@Fidelity International | Flutter App Developer | Solving for India Regional Qualified | HackOn with Amazon'22",
           photo: "/images/pawanbhai.png",
           link: "https://www.linkedin.com/in/pawan-k-9490581b5/",
+        },
+        {
+          name: "SANAT SHIKHAR SINHA",
+          role: "MERN | Full stack Developer | Machine Learning Engineer | E-Cell SOA President",
+          photo: "/images/Sanat.png",
+          link: "https://www.linkedin.com/in/sanatsinhaa/",
         },
       ],
     },
