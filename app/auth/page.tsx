@@ -466,6 +466,7 @@ const RegistrationPage = () => {
                       placeholder="Enter your registration number"
                       value={formData.registration_no}
                       onChange={handleInputChange}
+                      uppercase
                       required
                     />
                   </>
@@ -478,6 +479,7 @@ const RegistrationPage = () => {
                     placeholder="Enter your Registration Number"
                     value={formData.registration_no}
                     onChange={handleInputChange}
+                    uppercase
                     required
                   />
                 )}
@@ -572,12 +574,14 @@ interface InputFieldProps {
   required?: boolean;
   togglePasswordVisibility?: () => void;
   showPassword?: boolean;
+  uppercase?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
   icon: Icon,
   togglePasswordVisibility,
   showPassword,
+  uppercase,
   ...props
 }) => (
   <div className="relative">
@@ -587,7 +591,9 @@ const InputField: React.FC<InputFieldProps> = ({
     />
     <input
       {...props}
-      className="w-full pl-10 pr-12 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-800 dark:text-white transition duration-200"
+      className={`w-full pl-10 pr-12 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-800 dark:text-white transition duration-200 ${
+        uppercase ? "uppercase" : ""
+      }`}
     />
     {props.name === "password" && togglePasswordVisibility && (
       <button
