@@ -223,7 +223,10 @@ const RegistrationPage = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === "registration_no") {
+      value = value.toUpperCase().trim();
+    }
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -235,11 +238,16 @@ const RegistrationPage = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await validationSchema.validate(formData, { abortEarly: false });
+      const sanitizedFormData = {
+        ...formData,
+        registration_no: formData.registration_no.trim().toUpperCase(),
+      };
+
+      await validationSchema.validate(sanitizedFormData, { abortEarly: false });
 
       const data = {
-        ...formData,
-        passwordConfirm: formData.password,
+        ...sanitizedFormData,
+        passwordConfirm: sanitizedFormData.password,
       };
 
       const record = await pb.collection("users").create(data);
@@ -274,7 +282,7 @@ const RegistrationPage = () => {
       };
 
       let bodyContent = JSON.stringify({
-        identity: formData.registration_no,
+        identity: formData.registration_no.trim().toUpperCase(),
         password: formData.password,
       });
 
@@ -454,7 +462,7 @@ const RegistrationPage = () => {
                     <InputField
                       icon={Hash}
                       name="registration_no"
-                      type={formData.branch}
+                      type="text"
                       placeholder="Enter your registration number"
                       value={formData.registration_no}
                       onChange={handleInputChange}
